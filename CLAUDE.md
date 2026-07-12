@@ -72,3 +72,12 @@ Laravel 12 (Blade + vanilla JS, no SPA framework), e-commerce project.
 - Primary locale: Ukrainian (`uk`), fallback: English (`en`) — set via `APP_LOCALE`/`APP_FALLBACK_LOCALE` in `.env`
 - Translation files: `lang/uk/*.php`, `lang/en/*.php` (plain PHP arrays, Laravel's `__('file.key')` convention)
 - No locale switcher UI yet, no locale-prefixed routes — only the default locale is wired up so far
+
+## Data model: Categories
+
+- Two tables, not one: `categories` (structural/non-translatable: `parent_id` self-reference for nesting, `image`, `is_active`, `sort_order`) and `category_translations` (`category_id`, `locale`, `name`, `slug`, `h1`, `meta_title`, `meta_description`, `description`) — one row per locale per category. Chosen over `name_uk`/`name_en` columns specifically so adding a 3rd language later is a data migration, not a schema migration.
+- `slug` is unique per-locale (`unique(['locale', 'slug'])`), not globally — uk and en slugs for the same category are independent and can differ.
+- SEO fields on a category: `slug` (clean URL), `meta_title` (often not the same text as the nav label), `meta_description` (SERP snippet, doesn't affect ranking but drives CTR), `description` (on-page body content — Google wants real text on category pages, not just a product grid), `h1` (only when it needs to differ from the nav label). Deliberately skipped `meta_keywords` — Google has ignored it since the mid-2000s.
+- `Category::translation($locale = null)` is a `hasOne` (not `hasMany`) scoped to one locale, defaulting to `app()->getLocale()` — the ergonomic accessor for "give me this category's text in the current language."
+- Both `CategoryFactory` and `CategoryTranslationFactory` exist; `CategoryFactory::configure()` auto-creates uk+en translations via `afterCreating` — a bare `Category::factory()->create()` is realistic/usable immediately, never an empty shell missing translations.
+- Admin CRUD for categories (controller/requests/views) not built yet — only the migrations/models/factories exist so far.
