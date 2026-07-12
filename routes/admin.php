@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
+use App\Http\Controllers\Admin\CategoryController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -15,5 +16,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/', function () {
             return view('admin.dashboard.index');
         })->name('dashboard');
+
+        Route::resource('categories', CategoryController::class)
+            ->except('show')
+            ->parameters(['categories' => 'categoryId']);
     });
 });
