@@ -46,6 +46,27 @@ Laravel 12 (Blade + vanilla JS, no SPA framework), e-commerce project.
 - Alternative colorways considered and rejected: Walnut (warm brown-black), Cochineal (wine/aubergine), Weld (bottle green) — see git history if revisiting
 - Other header layouts considered and rejected: "Vat lid" (full dark header), "Minimal mark" (nav hidden behind menu trigger), "Two-tier dark" (fully dark two-row header)
 
+## Backend conventions
+
+- Validation lives in `App\Http\Requests\...` FormRequest classes, never inline `$request->validate()` in a controller. The Requests tree mirrors the Controllers tree 1:1: `app/Http/Controllers/Admin/AuthController.php` → `app/Http/Requests/Admin/LoginRequest.php`. Controller methods type-hint the FormRequest and read `$request->validated()`.
+- Admin auth: separate `admin` guard + `admins` table/`Admin` model (not the customer `users` table) — a compromised customer account can never reach admin routes even via a role-check bug. No public registration; admins are provisioned out-of-band (console command / tinker), never via a form.
+- Login rate limiting is hand-rolled on `Illuminate\Support\Facades\RateLimiter` (5 attempts / 60s decay, keyed on `email|ip`) — Laravel 12 dropped the old `ThrottlesLogins` trait, it no longer exists in the framework. Lives inside the FormRequest's own `authenticate()` method (Breeze-style), not the controller — the request class owns the full "is this login valid" question, field format AND rate limit AND credential check; the controller just calls `$request->authenticate()`.
+- Session fixation: `session()->regenerate()` right after a successful login, `invalidate()` + `regenerateToken()` on logout.
+- Routes are split by area into their own files, not one shared `web.php`: `routes/front.php` (storefront), `routes/admin.php` (admin, prefix `/admin`, name prefix `admin.`). `routes/web.php` just `require`s both so they stay in the default `web` middleware group.
+- Admin routes: `admin.login` (GET/POST), `admin.logout` (POST, `auth:admin`), `admin.dashboard` (GET `/admin`, `auth:admin`, currently a placeholder). Unauthenticated guests hitting any `admin*` path are redirected to `admin.login` via `redirectGuestsTo` in `bootstrap/app.php` (guard-aware — front guests would redirect to `front.home` instead).
+- Admin layout is deliberately plain/utilitarian (`components/admin/layouts/layout.blade.php`) — no OCRE storefront branding/fonts, this is an internal tool not customer-facing.
+- New admins: `php artisan admin:create` (interactive Laravel Prompts, validates + hashes password) — no self-registration route exists or should exist.
+- Also fixed a related bug while adding tests: `redirectUsersTo` wasn't configured in `bootstrap/app.php`, so an already-authenticated admin hitting `/admin/login` silently fell through Laravel's default `guest` middleware fallback (checks for named routes `dashboard`/`home`, neither exists here) to `/` — the storefront homepage, not the admin dashboard. Fixed by adding a guard-aware `redirectUsersTo` alongside the existing `redirectGuestsTo`.
+
+## Testing
+
+- Plain PHPUnit (no Pest). `phpunit.xml` sets `APP_ENV=testing`, which auto-disables CSRF verification for the test run (`VerifyCsrfToken::runningUnitTests()`) — feature tests can `$this->post()` without manually handling a token.
+- `DB_DATABASE=testing` still uses the real `mysql` connection (not sqlite) — Sail's MySQL container already creates a `testing` database on boot (see `vendor/laravel/sail/database/mysql/create-testing-database.sh`), so no extra setup is needed; feature tests use `RefreshDatabase`.
+- `SESSION_DRIVER=array` / `CACHE_STORE=array` in tests — session and rate-limiter state never touch the real `sessions`/`cache` tables, and reset cleanly between tests since Laravel rebuilds the app container per test.
+- `tests/Feature/Admin/LoginTest.php` is the reference example for auth-flow tests: renders, redirects for both directions of the `guest`/`auth` middleware, valid/invalid credentials, the rate-limit lockout (assert the *generic* error message, not just "it failed" — enumeration-safety is a first-class thing to test here, not an afterthought), logout.
+- `database/factories/AdminFactory.php` mirrors `UserFactory` (same static-cached-password trick to avoid re-hashing per row) — needed `Admin::class` to `use HasFactory`, which the model didn't have initially.
+- Run: `./vendor/bin/sail artisan test` (or `--filter=LoginTest` for just this suite).
+
 ## Localization
 
 - Primary locale: Ukrainian (`uk`), fallback: English (`en`) — set via `APP_LOCALE`/`APP_FALLBACK_LOCALE` in `.env`
