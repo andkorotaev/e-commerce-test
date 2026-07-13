@@ -7,7 +7,7 @@
 @endphp
 
 <div
-    class="flex items-center justify-between px-10 py-2.5 font-mono text-[11px] tracking-wide {{ $classes }}"
+    class="flex items-center justify-between px-4 py-2.5 font-mono text-[11px] tracking-wide md:px-10 {{ $classes }}"
 >
     <span>{{ $left }}</span>
     <span>{{ $right }}</span>

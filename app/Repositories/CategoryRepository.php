@@ -45,6 +45,24 @@ class CategoryRepository
     }
 
     /**
+     * Every active category, flat — the raw material for building an
+     * active-only tree (e.g. the header nav, which needs all 3 levels: root
+     * → L2 → L3). Same shape as `all()`, just filtered — `all()` itself
+     * can't add the filter since the admin tree legitimately needs to show
+     * inactive categories too, to manage them.
+     *
+     * @return Collection<int, CategoryDto>
+     */
+    public function activeAll(): Collection
+    {
+        return Category::where('is_active', true)
+            ->with('translations')
+            ->orderBy('sort_order')
+            ->get()
+            ->map(fn (Category $category) => CategoryDto::fromModel($category));
+    }
+
+    /**
      * A single active category by its translated slug, with its own active
      * children attached (so the front category page can list them without a
      * second round trip). Returns null if no active category has that slug

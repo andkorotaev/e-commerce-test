@@ -32,6 +32,18 @@ class CategoryService
         return $this->categories->roots();
     }
 
+    /**
+     * Full active-only tree (root → L2 → L3) for the header nav dropdown —
+     * unlike `tree()`, this excludes inactive categories, which the admin
+     * tree deliberately doesn't (admins need to see and manage them).
+     *
+     * @return Collection<int, CategoryDto>
+     */
+    public function navigation(): Collection
+    {
+        return $this->buildTree($this->categories->activeAll(), null);
+    }
+
     public function findBySlug(string $slug, string $locale): ?CategoryDto
     {
         return $this->categories->findBySlug($slug, $locale);
