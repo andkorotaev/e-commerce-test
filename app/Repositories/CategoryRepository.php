@@ -29,6 +29,51 @@ class CategoryRepository
     }
 
     /**
+     * Active, top-level categories only — for storefront display (e.g. the
+     * homepage category grid), not the admin tree which shows everything.
+     *
+     * @return Collection<int, CategoryDto>
+     */
+    public function roots(): Collection
+    {
+        return Category::whereNull('parent_id')
+            ->where('is_active', true)
+            ->with('translations')
+            ->orderBy('sort_order')
+            ->get()
+            ->map(fn (Category $category) => CategoryDto::fromModel($category));
+    }
+
+    /**
+     * A single active category by its translated slug, with its own active
+     * children attached (so the front category page can list them without a
+     * second round trip). Returns null if no active category has that slug
+     * in the given locale.
+     */
+    public function findBySlug(string $slug, string $locale): ?CategoryDto
+    {
+        $category = Category::where('is_active', true)
+            ->whereHas('translations', function ($query) use ($slug, $locale) {
+                $query->where('slug', $slug)->where('locale', $locale);
+            })
+            ->with('translations')
+            ->first();
+
+        if (! $category) {
+            return null;
+        }
+
+        $children = Category::where('parent_id', $category->id)
+            ->where('is_active', true)
+            ->with('translations')
+            ->orderBy('sort_order')
+            ->get()
+            ->map(fn (Category $child) => CategoryDto::fromModel($child));
+
+        return CategoryDto::fromModel($category)->withChildren($children);
+    }
+
+    /**
      * @param  array<string, mixed>  $attributes
      */
     public function create(array $attributes): CategoryDto

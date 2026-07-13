@@ -27,6 +27,19 @@ class CategoryService
     /**
      * @return Collection<int, CategoryDto>
      */
+    public function roots(): Collection
+    {
+        return $this->categories->roots();
+    }
+
+    public function findBySlug(string $slug, string $locale): ?CategoryDto
+    {
+        return $this->categories->findBySlug($slug, $locale);
+    }
+
+    /**
+     * @return Collection<int, CategoryDto>
+     */
     public function tree(): Collection
     {
         return $this->buildTree($this->categories->all(), null);
