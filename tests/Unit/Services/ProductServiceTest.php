@@ -29,6 +29,7 @@ class ProductServiceTest extends TestCase
 
         $dto = new ProductInputDto(
             categoryId: Category::factory()->create()->id,
+            brandId: null,
             sku: null,
             price: 100.0,
             oldPrice: null,
@@ -41,6 +42,7 @@ class ProductServiceTest extends TestCase
             ]),
             newImages: collect([UploadedFile::fake()->image('test.jpg')]),
             deleteImageIds: collect(),
+            variants: collect(),
         );
 
         try {

@@ -2,9 +2,11 @@
 
 namespace App\Dto\Product;
 
+use App\Dto\ProductVariant\ProductVariantDto;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\ProductTranslation;
+use App\Models\ProductVariant;
 use Illuminate\Support\Collection;
 
 final readonly class ProductDto
@@ -12,10 +14,12 @@ final readonly class ProductDto
     /**
      * @param  Collection<int, ProductTranslationDto>  $translations
      * @param  Collection<int, ProductImageDto>  $images
+     * @param  Collection<int, ProductVariantDto>  $variants
      */
     public function __construct(
         public int $id,
         public int $categoryId,
+        public ?int $brandId,
         public ?string $sku,
         public float $price,
         public ?float $oldPrice,
@@ -24,6 +28,7 @@ final readonly class ProductDto
         public int $sortOrder,
         public Collection $translations,
         public Collection $images,
+        public Collection $variants,
     ) {}
 
     public static function fromModel(Product $product): self
@@ -31,6 +36,7 @@ final readonly class ProductDto
         return new self(
             id: $product->id,
             categoryId: $product->category_id,
+            brandId: $product->brand_id,
             sku: $product->sku,
             price: (float) $product->price,
             oldPrice: $product->old_price !== null ? (float) $product->old_price : null,
@@ -42,6 +48,9 @@ final readonly class ProductDto
             ),
             images: $product->images->map(
                 fn (ProductImage $image) => ProductImageDto::fromModel($image)
+            ),
+            variants: $product->variants->map(
+                fn (ProductVariant $variant) => ProductVariantDto::fromModel($variant)
             ),
         );
     }

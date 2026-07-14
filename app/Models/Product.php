@@ -19,6 +19,7 @@ class Product extends Model
      */
     protected $fillable = [
         'category_id',
+        'brand_id',
         'sku',
         'price',
         'old_price',
@@ -48,6 +49,14 @@ class Product extends Model
     }
 
     /**
+     * @return BelongsTo<Brand, $this>
+     */
+    public function brand(): BelongsTo
+    {
+        return $this->belongsTo(Brand::class);
+    }
+
+    /**
      * @return HasMany<ProductTranslation, $this>
      */
     public function translations(): HasMany
@@ -70,5 +79,13 @@ class Product extends Model
     public function images(): HasMany
     {
         return $this->hasMany(ProductImage::class)->orderBy('sort_order');
+    }
+
+    /**
+     * @return HasMany<ProductVariant, $this>
+     */
+    public function variants(): HasMany
+    {
+        return $this->hasMany(ProductVariant::class);
     }
 }

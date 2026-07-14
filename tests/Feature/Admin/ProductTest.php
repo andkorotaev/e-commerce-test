@@ -3,8 +3,12 @@
 namespace Tests\Feature\Admin;
 
 use App\Models\Admin;
+use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductAttribute;
+use App\Models\ProductAttributeValue;
+use App\Models\ProductVariant;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -295,5 +299,101 @@ class ProductTest extends TestCase
 
         Storage::disk('public')->assertMissing('products/to-delete.jpg');
         $this->assertDatabaseMissing('product_images', ['product_id' => $product->id]);
+    }
+
+    public function test_a_product_can_be_created_with_a_brand(): void
+    {
+        $brand = Brand::factory()->create();
+
+        $this->actingAs($this->admin, 'admin')
+            ->post(route('admin.products.store'), $this->validPayload(['brand_id' => $brand->id]));
+
+        $this->assertDatabaseHas('products', ['sku' => 'TEST-SKU-001', 'brand_id' => $brand->id]);
+    }
+
+    public function test_a_product_can_be_created_with_variants(): void
+    {
+        $colorValue = ProductAttributeValue::factory()->create();
+
+        $this->actingAs($this->admin, 'admin')->post(route('admin.products.store'), $this->validPayload([
+            'variants' => [
+                [
+                    'sku' => 'VARIANT-RED',
+                    'price' => 199.99,
+                    'stock' => 4,
+                    'is_active' => '1',
+                    'attribute_value_ids' => [$colorValue->id],
+                ],
+            ],
+        ]));
+
+        $product = Product::sole();
+        $variant = $product->variants()->sole();
+
+        $this->assertSame('VARIANT-RED', $variant->sku);
+        $this->assertSame(4, $variant->stock);
+        $this->assertTrue($variant->attributeValues->contains($colorValue->id));
+    }
+
+    public function test_store_rejects_a_variant_with_two_values_for_the_same_attribute(): void
+    {
+        $attribute = ProductAttribute::factory()->create();
+        $red = ProductAttributeValue::factory()->for($attribute, 'attribute')->create(['product_attribute_id' => $attribute->id]);
+        $blue = ProductAttributeValue::factory()->for($attribute, 'attribute')->create(['product_attribute_id' => $attribute->id]);
+
+        $response = $this->actingAs($this->admin, 'admin')->post(route('admin.products.store'), $this->validPayload([
+            'variants' => [
+                [
+                    'sku' => 'VARIANT-BAD',
+                    'stock' => 1,
+                    'attribute_value_ids' => [$red->id, $blue->id],
+                ],
+            ],
+        ]));
+
+        $response->assertSessionHasErrors('variants.0.attribute_value_ids');
+    }
+
+    public function test_updating_can_keep_one_variant_drop_another_and_add_a_new_one(): void
+    {
+        $value = ProductAttributeValue::factory()->create();
+        $product = Product::factory()->create(['category_id' => $this->category->id]);
+        $keptVariant = ProductVariant::factory()->for($product)->create();
+        $keptVariant->attributeValues()->attach($value->id);
+        $droppedVariant = ProductVariant::factory()->for($product)->create();
+        $droppedVariant->attributeValues()->attach($value->id);
+
+        $this->actingAs($this->admin, 'admin')->put(route('admin.products.update', $product->id), $this->validPayload([
+            'variants' => [
+                [
+                    'id' => $keptVariant->id,
+                    'sku' => $keptVariant->sku,
+                    'stock' => 99,
+                    'attribute_value_ids' => [$value->id],
+                ],
+                [
+                    'sku' => 'BRAND-NEW-VARIANT',
+                    'stock' => 2,
+                    'attribute_value_ids' => [$value->id],
+                ],
+            ],
+        ]));
+
+        $this->assertDatabaseHas('product_variants', ['id' => $keptVariant->id, 'stock' => 99]);
+        $this->assertDatabaseMissing('product_variants', ['id' => $droppedVariant->id]);
+        $this->assertDatabaseHas('product_variants', ['product_id' => $product->id, 'sku' => 'BRAND-NEW-VARIANT']);
+    }
+
+    public function test_deleting_a_product_removes_its_variants_and_their_image_files(): void
+    {
+        Storage::fake('public');
+        $product = Product::factory()->create();
+        $variant = ProductVariant::factory()->for($product)->create(['image' => 'products/variants/to-delete.jpg']);
+        Storage::disk('public')->put('products/variants/to-delete.jpg', 'content');
+
+        $this->actingAs($this->admin, 'admin')->delete(route('admin.products.destroy', $product->id));
+
+        Storage::disk('public')->assertMissing('products/variants/to-delete.jpg');
+        $this->assertDatabaseMissing('product_variants', ['id' => $variant->id]);
     }
 }

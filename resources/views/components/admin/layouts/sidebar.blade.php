@@ -3,6 +3,8 @@
         ['label' => 'Dashboard', 'route' => 'admin.dashboard', 'active' => request()->routeIs('admin.dashboard')],
         ['label' => 'Categories', 'route' => 'admin.categories.index', 'active' => request()->routeIs('admin.categories.*')],
         ['label' => 'Products', 'route' => 'admin.products.index', 'active' => request()->routeIs('admin.products.*')],
+        ['label' => 'Brands', 'route' => 'admin.brands.index', 'active' => request()->routeIs('admin.brands.*')],
+        ['label' => 'Attributes', 'route' => 'admin.product-attributes.index', 'active' => request()->routeIs('admin.product-attributes.*')],
     ];
 @endphp
 

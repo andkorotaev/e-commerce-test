@@ -1,4 +1,4 @@
-@props(['product' => null, 'categoryOptions' => []])
+@props(['product' => null, 'categoryOptions' => [], 'brands' => [], 'productAttributes' => []])
 
 @php
     $inputClass = 'w-full rounded-md border border-ink/15 bg-white px-3 py-2.5 text-sm shadow-sm transition-colors focus:border-ink focus:outline-none focus:ring-1 focus:ring-ink/20';
@@ -47,6 +47,19 @@
                     <p class="{{ $errorClass }}">{{ $message }}</p>
                 @enderror
             </div>
+        </div>
+
+        <div class="mt-5">
+            <label for="brand_id" class="{{ $labelClass }}">Brand <span class="font-normal text-ink/40">(optional)</span></label>
+            <select id="brand_id" name="brand_id" class="{{ $inputClass }}">
+                <option value="">— None —</option>
+                @foreach ($brands as $brand)
+                    <option value="{{ $brand->id }}" @selected(old('brand_id', $product?->brandId) == $brand->id)>{{ $brand->name }}</option>
+                @endforeach
+            </select>
+            @error('brand_id')
+                <p class="{{ $errorClass }}">{{ $message }}</p>
+            @enderror
         </div>
 
         <div class="mt-5 grid grid-cols-4 gap-5">
@@ -153,6 +166,27 @@
             <p class="{{ $errorClass }}">{{ $message }}</p>
         @enderror
     </div>
+
+    @if (count($productAttributes))
+        <div data-component="admin/products/form" class="rounded-lg border border-ink/10 bg-white p-6 shadow-sm">
+            <div class="mb-5 flex items-center justify-between">
+                <h2 class="text-sm font-semibold text-ink">Variants <span class="font-normal text-ink/40">(optional — leave empty for a single-SKU product)</span></h2>
+                <button type="button" data-add-variant class="rounded-md border border-ink/15 px-3 py-1.5 text-xs font-medium text-ink/70 transition-colors hover:bg-ink/5">
+                    Add variant
+                </button>
+            </div>
+
+            <div data-variants-container class="flex flex-col gap-3">
+                @foreach ($product?->variants ?? [] as $variant)
+                    <x-admin.products.variant-row :row-key="$variant->id" :variant="$variant" :product-attributes="$productAttributes" />
+                @endforeach
+            </div>
+
+            <template data-variant-row-template>
+                <x-admin.products.variant-row row-key="__KEY__" :product-attributes="$productAttributes" />
+            </template>
+        </div>
+    @endif
 
     @foreach (config('localization.locales') as $locale => $label)
         @php $translation = $product?->translation($locale); @endphp

@@ -5,6 +5,6 @@
         </a>
         <h1 class="mb-8 text-lg font-medium text-ink">Edit product</h1>
 
-        <x-admin.products.form :product="$product" :category-options="$categoryOptions" />
+        <x-admin.products.form :product="$product" :category-options="$categoryOptions" :brands="$brands" :product-attributes="$attributes" />
     </div>
 </x-admin.layouts.layout>

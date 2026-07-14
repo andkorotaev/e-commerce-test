@@ -13,9 +13,11 @@ class ProductRepository
      *
      * @return Collection<int, ProductDto>
      */
+    protected const array WITH = ['translations', 'images', 'variants.attributeValues.translations'];
+
     public function all(): Collection
     {
-        return Product::with(['translations', 'images'])
+        return Product::with(self::WITH)
             ->orderBy('sort_order')
             ->get()
             ->map(fn (Product $product) => ProductDto::fromModel($product));
@@ -23,7 +25,7 @@ class ProductRepository
 
     public function find(int $id): ?ProductDto
     {
-        $product = Product::with(['translations', 'images'])->find($id);
+        $product = Product::with(self::WITH)->find($id);
 
         return $product ? ProductDto::fromModel($product) : null;
     }
@@ -37,7 +39,7 @@ class ProductRepository
     {
         return Product::where('category_id', $categoryId)
             ->where('is_active', true)
-            ->with(['translations', 'images'])
+            ->with(self::WITH)
             ->orderBy('sort_order')
             ->get()
             ->map(fn (Product $product) => ProductDto::fromModel($product));
@@ -54,7 +56,7 @@ class ProductRepository
             ->whereHas('translations', function ($query) use ($slug, $locale) {
                 $query->where('slug', $slug)->where('locale', $locale);
             })
-            ->with(['translations', 'images'])
+            ->with(self::WITH)
             ->first();
 
         return $product ? ProductDto::fromModel($product) : null;
@@ -67,7 +69,7 @@ class ProductRepository
     {
         $product = Product::create($attributes);
 
-        return ProductDto::fromModel($product->load(['translations', 'images']));
+        return ProductDto::fromModel($product->load(self::WITH));
     }
 
     /**
@@ -78,7 +80,7 @@ class ProductRepository
         $product = Product::findOrFail($id);
         $product->update($attributes);
 
-        return ProductDto::fromModel($product->fresh(['translations', 'images']));
+        return ProductDto::fromModel($product->fresh(self::WITH));
     }
 
     public function delete(int $id): void

@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
+use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\ProductAttributeController;
 use App\Http\Controllers\Admin\ProductController;
 use Illuminate\Support\Facades\Route;
 
@@ -25,5 +27,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('products', ProductController::class)
             ->except('show')
             ->parameters(['products' => 'productId']);
+
+        Route::resource('brands', BrandController::class)
+            ->except('show')
+            ->parameters(['brands' => 'brandId']);
+
+        Route::resource('product-attributes', ProductAttributeController::class)
+            ->except('show')
+            ->parameters(['product-attributes' => 'productAttributeId']);
     });
 });
