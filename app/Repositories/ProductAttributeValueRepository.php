@@ -26,6 +26,27 @@ class ProductAttributeValueRepository
         return $value ? ProductAttributeValueDto::fromModel($value) : null;
     }
 
+    /**
+     * Values of a given attribute (by slug, e.g. "color"/"size") actually
+     * used by an active variant of an active product within the given
+     * category ids — the storefront listing page's color/size filter facets.
+     *
+     * @param  array<int, int>  $categoryIds
+     * @return Collection<int, ProductAttributeValueDto>
+     */
+    public function facetForCategories(string $attributeSlug, array $categoryIds): Collection
+    {
+        return ProductAttributeValue::query()
+            ->whereHas('attribute', fn ($query) => $query->where('slug', $attributeSlug))
+            ->whereHas('variants', function ($query) use ($categoryIds) {
+                $query->where('is_active', true)
+                    ->whereHas('product', fn ($query) => $query->whereIn('category_id', $categoryIds)->where('is_active', true));
+            })
+            ->with('translations')
+            ->get()
+            ->map(fn (ProductAttributeValue $value) => ProductAttributeValueDto::fromModel($value));
+    }
+
     public function create(int $attributeId, string $slug): ProductAttributeValueDto
     {
         $value = ProductAttributeValue::create([

@@ -3,7 +3,10 @@
 namespace App\Repositories;
 
 use App\Dto\Product\ProductDto;
+use App\Dto\Product\ProductFilterDto;
+use App\Dto\Product\ProductListItemDto;
 use App\Models\Product;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 class ProductRepository
@@ -60,6 +63,101 @@ class ProductRepository
             ->first();
 
         return $product ? ProductDto::fromModel($product) : null;
+    }
+
+    /**
+     * Active products across a set of category ids (a category's own
+     * subtree), filtered/sorted/searched per $filters — the storefront
+     * category listing page. Returns lean ProductListItemDto rows (not the
+     * full admin ProductDto) via the paginator's own ->through(), so the
+     * DB-only-in/DTOs-out rule holds even under pagination.
+     *
+     * @param  array<int, int>  $categoryIds
+     * @return LengthAwarePaginator<int, ProductListItemDto>
+     */
+    public function filtered(array $categoryIds, ProductFilterDto $filters): LengthAwarePaginator
+    {
+        $locale = app()->getLocale();
+
+        $query = Product::query()
+            ->select('products.*')
+            ->join('product_translations', function ($join) use ($locale) {
+                $join->on('product_translations.product_id', '=', 'products.id')
+                    ->where('product_translations.locale', $locale);
+            })
+            ->whereIn('products.category_id', $categoryIds)
+            ->where('products.is_active', true)
+            ->with([
+                'translations' => fn ($query) => $query->where('locale', $locale),
+                'images' => fn ($query) => $query->orderBy('sort_order')->limit(1),
+                'brand',
+            ]);
+
+        if ($filters->brandIds->isNotEmpty()) {
+            $query->whereIn('products.brand_id', $filters->brandIds->all());
+        }
+
+        if ($filters->colorIds->isNotEmpty()) {
+            $query->whereHas('variants', function ($query) use ($filters) {
+                $query->where('is_active', true)
+                    ->whereHas('attributeValues', fn ($query) => $query->whereIn('product_attribute_values.id', $filters->colorIds->all()));
+            });
+        }
+
+        if ($filters->sizeIds->isNotEmpty()) {
+            $query->whereHas('variants', function ($query) use ($filters) {
+                $query->where('is_active', true)
+                    ->whereHas('attributeValues', fn ($query) => $query->whereIn('product_attribute_values.id', $filters->sizeIds->all()));
+            });
+        }
+
+        if ($filters->priceMin !== null) {
+            $query->where('products.price', '>=', $filters->priceMin);
+        }
+
+        if ($filters->priceMax !== null) {
+            $query->where('products.price', '<=', $filters->priceMax);
+        }
+
+        if ($filters->inStockOnly) {
+            $query->where('products.stock', '>', 0);
+        }
+
+        if ($filters->search !== null && trim($filters->search) !== '') {
+            $query->where('product_translations.name', 'like', '%'.$filters->search.'%');
+        }
+
+        match ($filters->sort) {
+            'price_asc' => $query->orderBy('products.price'),
+            'price_desc' => $query->orderByDesc('products.price'),
+            'newest' => $query->orderByDesc('products.created_at'),
+            'name' => $query->orderBy('product_translations.name'),
+            default => $query->orderBy('products.sort_order'),
+        };
+
+        return $query->paginate($filters->perPage)
+            ->withQueryString()
+            ->through(fn (Product $product) => ProductListItemDto::fromModel($product, $locale));
+    }
+
+    /**
+     * Min/max active price across a set of category ids — bounds for the
+     * listing page's price-range filter inputs.
+     *
+     * @param  array<int, int>  $categoryIds
+     * @return array{min: float, max: float}
+     */
+    public function priceRangeForCategories(array $categoryIds): array
+    {
+        $result = Product::whereIn('category_id', $categoryIds)
+            ->where('is_active', true)
+            ->selectRaw('MIN(price) as min_price, MAX(price) as max_price')
+            ->first();
+
+        return [
+            'min' => $result?->min_price !== null ? (float) $result->min_price : 0.0,
+            'max' => $result?->max_price !== null ? (float) $result->max_price : 0.0,
+        ];
     }
 
     /**

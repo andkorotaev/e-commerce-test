@@ -1,4 +1,4 @@
-@props(['category', 'index' => 0])
+@props(['category', 'index' => 0, 'compact' => false])
 
 @php $translation = $category->translation(app()->getLocale()); @endphp
 
@@ -7,7 +7,7 @@
     class="group block motion-safe:opacity-0 motion-safe:[animation:fade-in-up_0.6s_ease-out_forwards]"
     style="animation-delay: {{ $index * 80 }}ms"
 >
-    <div class="aspect-[3/4] overflow-hidden bg-stone/10">
+    <div class="{{ $compact ? 'aspect-square' : 'aspect-[3/4]' }} overflow-hidden bg-stone/10">
         @if ($category->image)
             <img
                 src="{{ Storage::url($category->image) }}"
@@ -16,10 +16,10 @@
             >
         @endif
     </div>
-    <h3 class="mt-4 text-base font-medium text-ink transition-colors duration-300 group-hover:text-madder">
+    <h3 class="{{ $compact ? 'mt-2 text-sm' : 'mt-4 text-base' }} font-medium text-ink transition-colors duration-300 group-hover:text-madder">
         {{ $translation?->name }}
     </h3>
-    @if ($translation?->description)
+    @if ($translation?->description && ! $compact)
         <p class="mt-1 text-sm text-ink/50">{{ $translation->description }}</p>
     @endif
 </a>

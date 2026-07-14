@@ -50,6 +50,62 @@ class CategoryService
     }
 
     /**
+     * A category's parent chain, root-first, NOT including the category
+     * itself — e.g. for "Кросівки" (Sneakers) this returns
+     * [Footwear] and NOT [Footwear, Sneakers]. Used to build breadcrumbs,
+     * where the current category is rendered separately as the trail's
+     * final, non-linked item.
+     *
+     * @return Collection<int, CategoryDto>
+     */
+    public function ancestors(int $categoryId): Collection
+    {
+        $byId = $this->categories->all()->keyBy('id');
+        $chain = collect();
+        $current = $byId->get($categoryId);
+
+        while ($current && $current->parentId !== null) {
+            $parent = $byId->get($current->parentId);
+
+            if (! $parent) {
+                break;
+            }
+
+            $chain->prepend($parent);
+            $current = $parent;
+        }
+
+        return $chain;
+    }
+
+    /**
+     * A category's own id plus every descendant id (children, grandchildren,
+     * ...) — the storefront product listing scopes to this so viewing a
+     * parent category (e.g. "Footwear") shows products from every leaf
+     * category underneath it, not just products assigned to that exact row.
+     *
+     * @return array<int, int>
+     */
+    public function descendantIds(int $categoryId): array
+    {
+        $all = $this->categories->all();
+        $ids = [$categoryId];
+
+        $collect = function (int $parentId) use ($all, &$ids, &$collect): void {
+            foreach ($all as $category) {
+                if ($category->parentId === $parentId) {
+                    $ids[] = $category->id;
+                    $collect($category->id);
+                }
+            }
+        };
+
+        $collect($categoryId);
+
+        return $ids;
+    }
+
+    /**
      * @return Collection<int, CategoryDto>
      */
     public function tree(): Collection

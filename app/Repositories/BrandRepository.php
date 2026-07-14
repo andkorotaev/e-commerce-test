@@ -39,6 +39,22 @@ class BrandRepository
     }
 
     /**
+     * Active brands actually used by an active product within the given
+     * category ids — the storefront listing page's brand filter facet.
+     *
+     * @param  array<int, int>  $categoryIds
+     * @return Collection<int, BrandDto>
+     */
+    public function facetForCategories(array $categoryIds): Collection
+    {
+        return Brand::where('is_active', true)
+            ->whereHas('products', fn ($query) => $query->whereIn('category_id', $categoryIds)->where('is_active', true))
+            ->orderBy('name')
+            ->get()
+            ->map(fn (Brand $brand) => BrandDto::fromModel($brand));
+    }
+
+    /**
      * @param  array<string, mixed>  $attributes
      */
     public function create(array $attributes): BrandDto
