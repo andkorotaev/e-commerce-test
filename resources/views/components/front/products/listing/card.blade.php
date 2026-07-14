@@ -1,7 +1,8 @@
 @props(['product', 'index' => 0])
 
-<div
-    class="group motion-safe:opacity-0 motion-safe:[animation:fade-in-up_0.6s_ease-out_forwards]"
+<a
+    href="{{ $product->slug ? route('front.products.show', $product->slug) : '#' }}"
+    class="group block motion-safe:opacity-0 motion-safe:[animation:fade-in-up_0.6s_ease-out_forwards]"
     style="animation-delay: {{ min($index, 12) * 60 }}ms"
 >
     <div class="relative aspect-[3/4] overflow-hidden bg-stone/10">
@@ -24,7 +25,7 @@
         <p class="mt-4 font-mono text-[10px] uppercase tracking-widest text-ink/40">{{ $product->brandName }}</p>
     @endif
 
-    <h3 class="mt-1 text-base font-medium text-ink">
+    <h3 class="mt-1 text-base font-medium text-ink transition-colors duration-300 group-hover:text-madder">
         {{ $product->name }}
     </h3>
 
@@ -34,4 +35,4 @@
         @endif
         {{ number_format($product->price, 0, ',', ' ') }} ₴
     </p>
-</div>
+</a>

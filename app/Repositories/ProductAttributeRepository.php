@@ -29,6 +29,18 @@ class ProductAttributeRepository
     }
 
     /**
+     * Looks an attribute up by its slug (e.g. "color"/"size") — the product
+     * page's variation picker needs to know which of a variant's attribute
+     * values is the color and which is the size.
+     */
+    public function findBySlug(string $slug): ?ProductAttributeDto
+    {
+        $attribute = ProductAttribute::where('slug', $slug)->with(self::WITH)->first();
+
+        return $attribute ? ProductAttributeDto::fromModel($attribute) : null;
+    }
+
+    /**
      * @param  array<string, mixed>  $attributes
      */
     public function create(array $attributes): ProductAttributeDto

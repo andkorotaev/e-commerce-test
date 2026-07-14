@@ -51,6 +51,14 @@ class ProductService
     }
 
     /**
+     * @return Collection<int, \App\Dto\Product\ProductListItemDto>
+     */
+    public function similarTo(ProductDto $product, int $limit = 8): Collection
+    {
+        return $this->products->similarTo($product->categoryId, $product->id, $limit);
+    }
+
+    /**
      * @throws RuntimeException
      */
     public function create(ProductInputDto $dto): ProductDto

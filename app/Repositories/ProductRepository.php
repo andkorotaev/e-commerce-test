@@ -66,6 +66,30 @@ class ProductRepository
     }
 
     /**
+     * Active products in the same category as $excludeProductId, excluding
+     * it — the product page's "similar products" rail.
+     *
+     * @return Collection<int, ProductListItemDto>
+     */
+    public function similarTo(int $categoryId, int $excludeProductId, int $limit): Collection
+    {
+        $locale = app()->getLocale();
+
+        return Product::where('category_id', $categoryId)
+            ->where('id', '!=', $excludeProductId)
+            ->where('is_active', true)
+            ->with([
+                'translations' => fn ($query) => $query->where('locale', $locale),
+                'images' => fn ($query) => $query->orderBy('sort_order')->limit(1),
+                'brand',
+            ])
+            ->orderBy('sort_order')
+            ->limit($limit)
+            ->get()
+            ->map(fn (Product $product) => ProductListItemDto::fromModel($product, $locale));
+    }
+
+    /**
      * Active products across a set of category ids (a category's own
      * subtree), filtered/sorted/searched per $filters — the storefront
      * category listing page. Returns lean ProductListItemDto rows (not the

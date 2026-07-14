@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ProductAttributeController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\ReviewController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -35,5 +36,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('product-attributes', ProductAttributeController::class)
             ->except('show')
             ->parameters(['product-attributes' => 'productAttributeId']);
+
+        Route::get('reviews', [ReviewController::class, 'index'])->name('reviews.index');
+        Route::post('reviews/{reviewId}/approve', [ReviewController::class, 'approve'])->name('reviews.approve');
+        Route::delete('reviews/{reviewId}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
     });
 });

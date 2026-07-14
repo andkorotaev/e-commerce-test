@@ -31,6 +31,11 @@ class ProductAttributeService
         return $this->attributes->all();
     }
 
+    public function findBySlug(string $slug): ?ProductAttributeDto
+    {
+        return $this->attributes->findBySlug($slug);
+    }
+
     public function find(int $id): ?ProductAttributeDto
     {
         return $this->attributes->find($id);
