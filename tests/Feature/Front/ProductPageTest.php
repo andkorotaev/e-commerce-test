@@ -6,8 +6,8 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\Review;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class ProductPageTest extends TestCase
@@ -94,37 +94,55 @@ class ProductPageTest extends TestCase
         $response->assertNotFound();
     }
 
+    public function test_guest_cannot_submit_a_review(): void
+    {
+        $this->productWithSlug('guest-review-product');
+
+        $response = $this->post(route('front.reviews.store', 'guest-review-product'), [
+            'rating' => 5,
+            'comment' => 'Дуже якісний товар!',
+        ]);
+
+        $response->assertRedirect(route('front.login'));
+        $this->assertDatabaseMissing('reviews', ['comment' => 'Дуже якісний товар!']);
+    }
+
     public function test_submitting_a_review_creates_an_unapproved_review_not_shown_on_the_page(): void
     {
         $this->productWithSlug('review-product');
+        $user = User::factory()->create(['name' => 'Іван Петренко']);
 
-        $response = $this->post(route('front.reviews.store', 'review-product'), [
-            'author_name' => 'Іван Петренко',
+        $response = $this->actingAs($user)->post(route('front.reviews.store', 'review-product'), [
             'rating' => 5,
             'comment' => 'Дуже якісний товар!',
         ]);
 
         $response->assertRedirect();
         $this->assertDatabaseHas('reviews', [
+            'user_id' => $user->id,
             'author_name' => 'Іван Петренко',
             'is_approved' => false,
         ]);
 
+        // The logged-in author's name legitimately still appears in the
+        // "you're posting as ..." form prompt — the real signal that the
+        // review itself isn't public yet is that its own comment text,
+        // which only ever renders inside an approved review entry, is absent.
         $page = $this->get(route('front.products.show', 'review-product'));
-        $page->assertDontSee('Іван Петренко');
+        $page->assertDontSee('Дуже якісний товар!');
     }
 
     public function test_review_submission_requires_valid_fields(): void
     {
         $this->productWithSlug('validation-product');
+        $user = User::factory()->create();
 
-        $response = $this->post(route('front.reviews.store', 'validation-product'), [
-            'author_name' => '',
+        $response = $this->actingAs($user)->post(route('front.reviews.store', 'validation-product'), [
             'rating' => 9,
             'comment' => '',
         ]);
 
-        $response->assertSessionHasErrors(['author_name', 'rating', 'comment']);
+        $response->assertSessionHasErrors(['rating', 'comment']);
     }
 
     public function test_approved_reviews_are_shown_and_rating_stats_are_correct(): void

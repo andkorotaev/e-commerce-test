@@ -6,6 +6,7 @@ final readonly class ReviewInputDto
 {
     public function __construct(
         public int $productId,
+        public int $userId,
         public string $authorName,
         public int $rating,
         public string $comment,
@@ -18,6 +19,7 @@ final readonly class ReviewInputDto
     {
         return new self(
             productId: (int) $data['product_id'],
+            userId: (int) $data['user_id'],
             authorName: $data['author_name'],
             rating: (int) $data['rating'],
             comment: $data['comment'],

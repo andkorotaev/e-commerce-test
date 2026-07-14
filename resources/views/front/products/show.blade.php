@@ -11,5 +11,6 @@
         :similar="$similar"
         :rating-stats="$ratingStats"
         :reviews="$reviews"
+        :is-wishlisted="$isWishlisted"
     />
 </x-front.layouts.layout>

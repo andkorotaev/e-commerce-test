@@ -2,6 +2,9 @@
 
 return [
     'search' => 'Search',
+    'account' => 'Account',
+    'login' => 'Log in',
+    'wishlist' => 'Wishlist',
     'cart' => 'Cart',
     'menu' => 'Menu',
     'close_menu' => 'Close menu',

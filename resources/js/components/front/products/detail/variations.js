@@ -21,8 +21,6 @@ export function init(root) {
     const stockHint = root.querySelector('[data-stock-hint]');
     const addToCartBtn = root.querySelector('[data-add-to-cart]');
     const cartLabel = root.querySelector('[data-add-to-cart-label]');
-    const wishlistBtn = root.querySelector('[data-add-to-wishlist]');
-    const wishlistLabel = root.querySelector('[data-add-to-wishlist-label]');
     const priceDisplay = document.querySelector('[data-product-price-display]');
     const stockStatus = document.querySelector('[data-stock-status]');
     const mainImage = document.querySelector('[data-gallery-main]');
@@ -126,14 +124,6 @@ export function init(root) {
             cartLabel.textContent = original;
             addToCartBtn.classList.remove('bg-madder');
         }, 1500);
-    });
-
-    wishlistBtn?.addEventListener('click', () => {
-        const active = wishlistBtn.dataset.active === 'true';
-        wishlistBtn.dataset.active = active ? 'false' : 'true';
-        if (wishlistLabel) {
-            wishlistLabel.textContent = active ? 'В обране' : 'В обраному';
-        }
     });
 
     update();

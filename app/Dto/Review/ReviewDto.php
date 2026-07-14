@@ -10,6 +10,7 @@ final readonly class ReviewDto
     public function __construct(
         public int $id,
         public int $productId,
+        public ?int $userId,
         public string $authorName,
         public int $rating,
         public string $comment,
@@ -23,6 +24,7 @@ final readonly class ReviewDto
         return new self(
             id: $review->id,
             productId: $review->product_id,
+            userId: $review->user_id,
             authorName: $review->author_name,
             rating: $review->rating,
             comment: $review->comment,

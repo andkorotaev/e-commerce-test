@@ -49,50 +49,47 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('front.reviews.store', $slug) }}" class="max-w-lg space-y-4">
-        @csrf
+    @auth
+        <form method="POST" action="{{ route('front.reviews.store', $slug) }}" class="max-w-lg space-y-4">
+            @csrf
 
-        <div>
-            <label class="mb-1 block font-mono text-xs uppercase tracking-widest text-ink/40">Ваше ім'я</label>
-            <input
-                type="text"
-                name="author_name"
-                value="{{ old('author_name') }}"
-                required
-                class="w-full border border-stone bg-transparent px-3 py-2 text-sm text-ink focus:border-ink focus:outline-none"
-            >
-            @error('author_name')
-                <p class="mt-1 text-xs text-madder">{{ $message }}</p>
-            @enderror
-        </div>
+            <p class="font-mono text-xs uppercase tracking-widest text-ink/40">
+                Ви пишете як {{ auth()->user()->name }}
+            </p>
 
-        <div>
-            <label class="mb-1 block font-mono text-xs uppercase tracking-widest text-ink/40">Оцінка</label>
-            <select name="rating" class="border border-stone bg-transparent px-3 py-2 text-sm text-ink focus:border-ink focus:outline-none">
-                @for ($i = 5; $i >= 1; $i--)
-                    <option value="{{ $i }}" @selected((int) old('rating', 5) === $i)>{{ $i }} / 5</option>
-                @endfor
-            </select>
-            @error('rating')
-                <p class="mt-1 text-xs text-madder">{{ $message }}</p>
-            @enderror
-        </div>
+            <div>
+                <label class="mb-1 block font-mono text-xs uppercase tracking-widest text-ink/40">Оцінка</label>
+                <select name="rating" class="border border-stone bg-transparent px-3 py-2 text-sm text-ink focus:border-ink focus:outline-none">
+                    @for ($i = 5; $i >= 1; $i--)
+                        <option value="{{ $i }}" @selected((int) old('rating', 5) === $i)>{{ $i }} / 5</option>
+                    @endfor
+                </select>
+                @error('rating')
+                    <p class="mt-1 text-xs text-madder">{{ $message }}</p>
+                @enderror
+            </div>
 
-        <div>
-            <label class="mb-1 block font-mono text-xs uppercase tracking-widest text-ink/40">Відгук</label>
-            <textarea
-                name="comment"
-                rows="4"
-                required
-                class="w-full border border-stone bg-transparent px-3 py-2 text-sm text-ink focus:border-ink focus:outline-none"
-            >{{ old('comment') }}</textarea>
-            @error('comment')
-                <p class="mt-1 text-xs text-madder">{{ $message }}</p>
-            @enderror
-        </div>
+            <div>
+                <label class="mb-1 block font-mono text-xs uppercase tracking-widest text-ink/40">Відгук</label>
+                <textarea
+                    name="comment"
+                    rows="4"
+                    required
+                    class="w-full border border-stone bg-transparent px-3 py-2 text-sm text-ink focus:border-ink focus:outline-none"
+                >{{ old('comment') }}</textarea>
+                @error('comment')
+                    <p class="mt-1 text-xs text-madder">{{ $message }}</p>
+                @enderror
+            </div>
 
-        <button type="submit" class="bg-ink px-6 py-3 font-mono text-xs uppercase tracking-widest text-bone transition-colors hover:bg-madder">
-            Залишити відгук
-        </button>
-    </form>
+            <button type="submit" class="bg-ink px-6 py-3 font-mono text-xs uppercase tracking-widest text-bone transition-colors hover:bg-madder">
+                Залишити відгук
+            </button>
+        </form>
+    @else
+        <p class="font-mono text-xs uppercase tracking-widest text-ink/40">
+            <a href="{{ route('front.login') }}" class="underline decoration-dotted underline-offset-4 hover:text-ink">Увійдіть</a>,
+            щоб залишити відгук
+        </p>
+    @endauth
 </div>

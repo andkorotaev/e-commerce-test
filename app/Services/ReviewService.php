@@ -49,6 +49,7 @@ class ReviewService
             // it only becomes public once an admin moderates it in.
             return $this->reviews->create([
                 'product_id' => $dto->productId,
+                'user_id' => $dto->userId,
                 'author_name' => $dto->authorName,
                 'rating' => $dto->rating,
                 'comment' => $dto->comment,

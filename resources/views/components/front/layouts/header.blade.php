@@ -1,4 +1,4 @@
-@props(['cartCount' => 0])
+@props(['cartCount' => 0, 'wishlistCount' => 0])
 
 <div>
     <x-front.layouts.header.announcement-bar />
@@ -12,6 +12,8 @@
 
         <div class="flex items-center gap-4 md:gap-6">
             <x-front.layouts.header.search />
+            <x-front.layouts.header.account />
+            <x-front.layouts.header.wishlist :count="$wishlistCount" />
             <x-front.layouts.header.cart :count="$cartCount" />
         </div>
     </header>

@@ -1,4 +1,4 @@
-@props(['product', 'colorValues', 'sizeValues', 'variantsPayload', 'hasSizeGuide'])
+@props(['product', 'colorValues', 'sizeValues', 'variantsPayload', 'hasSizeGuide', 'isWishlisted'])
 
 @php
     $locale = app()->getLocale();
@@ -96,15 +96,29 @@
         >
             <span data-add-to-cart-label>Додати в кошик</span>
         </button>
-        <button
-            type="button"
-            data-add-to-wishlist
-            class="flex items-center justify-center gap-2 border border-stone px-6 py-3 font-mono text-xs uppercase tracking-widest text-ink/70 transition-colors hover:border-ink hover:text-ink data-[active=true]:border-madder data-[active=true]:text-madder"
-        >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="h-4 w-4">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 20s-7-4.35-9.5-8.5C.5 8 2 4.5 5.5 4c2-.3 3.7.7 4.5 2 .8-1.3 2.5-2.3 4.5-2 3.5.5 5 4 3 7.5C19 15.65 12 20 12 20z" />
-            </svg>
-            <span data-add-to-wishlist-label>В обране</span>
-        </button>
+        @auth
+            <form method="POST" action="{{ route('front.wishlist.toggle', $product->id) }}">
+                @csrf
+                <button
+                    type="submit"
+                    class="flex items-center justify-center gap-2 border px-6 py-3 font-mono text-xs uppercase tracking-widest transition-colors {{ $isWishlisted ? 'border-madder text-madder' : 'border-stone text-ink/70 hover:border-ink hover:text-ink' }}"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="{{ $isWishlisted ? 'currentColor' : 'none' }}" stroke="currentColor" stroke-width="1.5" class="h-4 w-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 20s-7-4.35-9.5-8.5C.5 8 2 4.5 5.5 4c2-.3 3.7.7 4.5 2 .8-1.3 2.5-2.3 4.5-2 3.5.5 5 4 3 7.5C19 15.65 12 20 12 20z" />
+                    </svg>
+                    {{ $isWishlisted ? 'В обраному' : 'В обране' }}
+                </button>
+            </form>
+        @else
+            <a
+                href="{{ route('front.login') }}"
+                class="flex items-center justify-center gap-2 border border-stone px-6 py-3 font-mono text-xs uppercase tracking-widest text-ink/70 transition-colors hover:border-ink hover:text-ink"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="h-4 w-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 20s-7-4.35-9.5-8.5C.5 8 2 4.5 5.5 4c2-.3 3.7.7 4.5 2 .8-1.3 2.5-2.3 4.5-2 3.5.5 5 4 3 7.5C19 15.65 12 20 12 20z" />
+                </svg>
+                В обране
+            </a>
+        @endauth
     </div>
 </div>

@@ -14,13 +14,13 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->redirectGuestsTo(function ($request) {
             return $request->is('admin*')
                 ? route('admin.login')
-                : route('front.home');
+                : route('front.login');
         });
 
         $middleware->redirectUsersTo(function ($request) {
             return $request->is('admin*')
                 ? route('admin.dashboard')
-                : route('front.home');
+                : route('front.account.profile');
         });
     })
     ->withExceptions(function (Exceptions $exceptions): void {

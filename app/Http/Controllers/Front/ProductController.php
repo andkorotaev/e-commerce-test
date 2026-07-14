@@ -8,6 +8,8 @@ use App\Services\CategoryService;
 use App\Services\ProductAttributeService;
 use App\Services\ProductService;
 use App\Services\ReviewService;
+use App\Services\WishlistService;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class ProductController extends Controller
@@ -18,9 +20,10 @@ class ProductController extends Controller
         protected ProductAttributeService $attributes,
         protected ReviewService $reviews,
         protected CategoryService $categories,
+        protected WishlistService $wishlist,
     ) {}
 
-    public function show(string $slug): View
+    public function show(Request $request, string $slug): View
     {
         $product = $this->products->findBySlug($slug, app()->getLocale());
 
@@ -30,6 +33,7 @@ class ProductController extends Controller
         $category = $this->categories->find($product->categoryId);
         $colorAttribute = $this->attributes->findBySlug('color');
         $sizeAttribute = $this->attributes->findBySlug('size');
+        $user = $request->user();
 
         return view('front.products.show', [
             'product' => $product,
@@ -41,6 +45,7 @@ class ProductController extends Controller
             'similar' => $this->products->similarTo($product),
             'ratingStats' => $this->reviews->ratingStats($product->id),
             'reviews' => $this->reviews->approvedForProduct($product->id),
+            'isWishlisted' => $user ? $this->wishlist->productIdsForUser($user->id)->contains($product->id) : false,
         ]);
     }
 }

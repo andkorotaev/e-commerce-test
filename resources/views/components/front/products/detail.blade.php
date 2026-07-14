@@ -1,4 +1,4 @@
-@props(['product', 'brand', 'category', 'ancestors', 'colorAttributeId', 'sizeAttributeId', 'similar', 'ratingStats', 'reviews'])
+@props(['product', 'brand', 'category', 'ancestors', 'colorAttributeId', 'sizeAttributeId', 'similar', 'ratingStats', 'reviews', 'isWishlisted'])
 
 @php
     $locale = app()->getLocale();
@@ -56,6 +56,7 @@
                 :size-values="$sizeValues"
                 :variants-payload="$variantsPayload"
                 :has-size-guide="$sizeValues->isNotEmpty()"
+                :is-wishlisted="$isWishlisted"
             />
         </div>
     </div>
