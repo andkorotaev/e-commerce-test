@@ -29,6 +29,32 @@ class ProductVariantRepository
     }
 
     /**
+     * Active variants by id, keyed by id — the cart hydrates a handful of
+     * variants at once rather than one at a time.
+     *
+     * @param  array<int, int>  $ids
+     * @return Collection<int, ProductVariantDto>
+     */
+    public function findMany(array $ids): Collection
+    {
+        return ProductVariant::whereIn('id', $ids)
+            ->where('is_active', true)
+            ->with(self::WITH)
+            ->get()
+            ->map(fn (ProductVariant $variant) => ProductVariantDto::fromModel($variant))
+            ->keyBy('id');
+    }
+
+    /**
+     * A single variant's own stock — used to clamp a cart line's quantity
+     * server-side.
+     */
+    public function stockFor(int $id): ?int
+    {
+        return ProductVariant::where('is_active', true)->whereKey($id)->value('stock');
+    }
+
+    /**
      * @param  array<string, mixed>  $attributes
      * @param  array<int, int>  $attributeValueIds
      */

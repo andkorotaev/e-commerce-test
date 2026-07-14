@@ -20,7 +20,8 @@ export function init(root) {
     const qtyInput = root.querySelector('[data-quantity-input]');
     const stockHint = root.querySelector('[data-stock-hint]');
     const addToCartBtn = root.querySelector('[data-add-to-cart]');
-    const cartLabel = root.querySelector('[data-add-to-cart-label]');
+    const cartVariantInput = root.querySelector('[data-cart-variant-input]');
+    const cartQuantityInput = root.querySelector('[data-cart-quantity-input]');
     const priceDisplay = document.querySelector('[data-product-price-display]');
     const stockStatus = document.querySelector('[data-stock-status]');
     const mainImage = document.querySelector('[data-gallery-main]');
@@ -79,6 +80,14 @@ export function init(root) {
         if (variant?.image && mainImage) {
             mainImage.src = variant.image;
         }
+
+        if (cartVariantInput) {
+            cartVariantInput.value = variant?.id ?? '';
+        }
+
+        if (cartQuantityInput && qtyInput) {
+            cartQuantityInput.value = qtyInput.value;
+        }
     };
 
     root.querySelectorAll('[data-variation-option]').forEach((button) => {
@@ -97,6 +106,9 @@ export function init(root) {
     root.querySelector('[data-quantity-decrease]')?.addEventListener('click', () => {
         if (qtyInput) {
             qtyInput.value = Math.max(1, Number(qtyInput.value) - 1);
+            if (cartQuantityInput) {
+                cartQuantityInput.value = qtyInput.value;
+            }
         }
     });
 
@@ -104,26 +116,20 @@ export function init(root) {
         if (qtyInput) {
             const max = Number(qtyInput.max) || 99;
             qtyInput.value = Math.min(max, Number(qtyInput.value) + 1);
+            if (cartQuantityInput) {
+                cartQuantityInput.value = qtyInput.value;
+            }
+        }
+    });
+
+    qtyInput?.addEventListener('input', () => {
+        if (cartQuantityInput) {
+            cartQuantityInput.value = qtyInput.value;
         }
     });
 
     root.querySelector('[data-size-guide-open]')?.addEventListener('click', () => {
         window.dispatchEvent(new CustomEvent('size-guide:open'));
-    });
-
-    addToCartBtn?.addEventListener('click', () => {
-        if (addToCartBtn.disabled || !cartLabel) {
-            return;
-        }
-
-        const original = cartLabel.textContent;
-        cartLabel.textContent = 'Додано!';
-        addToCartBtn.classList.add('bg-madder');
-
-        setTimeout(() => {
-            cartLabel.textContent = original;
-            addToCartBtn.classList.remove('bg-madder');
-        }, 1500);
     });
 
     update();

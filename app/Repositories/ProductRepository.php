@@ -34,6 +34,40 @@ class ProductRepository
     }
 
     /**
+     * Active products by id, as the lean listing-card shape, keyed by id —
+     * the cart (and anywhere else that needs to hydrate a handful of
+     * products by id at once, not a whole category) reuses this rather
+     * than the full ProductDto.
+     *
+     * @param  array<int, int>  $ids
+     * @return Collection<int, ProductListItemDto>
+     */
+    public function findManyAsListItems(array $ids): Collection
+    {
+        $locale = app()->getLocale();
+
+        return Product::whereIn('id', $ids)
+            ->where('is_active', true)
+            ->with([
+                'translations' => fn ($query) => $query->where('locale', $locale),
+                'images' => fn ($query) => $query->orderBy('sort_order')->limit(1),
+                'brand',
+            ])
+            ->get()
+            ->map(fn (Product $product) => ProductListItemDto::fromModel($product, $locale))
+            ->keyBy('id');
+    }
+
+    /**
+     * A single product's own stock, without pulling in translations/images/
+     * variants — used to clamp a cart line's quantity server-side.
+     */
+    public function stockFor(int $id): ?int
+    {
+        return Product::where('is_active', true)->whereKey($id)->value('stock');
+    }
+
+    /**
      * Active products in a given category — for storefront category pages.
      *
      * @return Collection<int, ProductDto>

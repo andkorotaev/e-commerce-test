@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Services\CartService;
 use App\Services\CategoryService;
 use App\Services\WishlistService;
 use Illuminate\Auth\Notifications\ResetPassword;
@@ -36,6 +37,7 @@ class AppServiceProvider extends ServiceProvider
 
             $userId = Auth::guard('web')->id();
             $view->with('wishlistCount', $userId ? app(WishlistService::class)->countForUser($userId) : 0);
+            $view->with('cartCount', app(CartService::class)->count());
         });
 
         // Laravel's built-in ResetPassword notification hardcodes a lookup

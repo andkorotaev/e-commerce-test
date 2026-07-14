@@ -5,6 +5,7 @@ use App\Http\Controllers\Front\Auth\ForgotPasswordController;
 use App\Http\Controllers\Front\Auth\LoginController;
 use App\Http\Controllers\Front\Auth\RegisterController;
 use App\Http\Controllers\Front\Auth\ResetPasswordController;
+use App\Http\Controllers\Front\CartController;
 use App\Http\Controllers\Front\CategoryController;
 use App\Http\Controllers\Front\HomeController;
 use App\Http\Controllers\Front\ProductController;
@@ -16,6 +17,15 @@ Route::get('/', [HomeController::class, 'index'])->name('front.home');
 Route::get('/catalog/{slug}/products', [CategoryController::class, 'products'])->name('front.categories.products');
 Route::get('/catalog/{slug}', [CategoryController::class, 'show'])->name('front.categories.show');
 Route::get('/product/{slug}', [ProductController::class, 'show'])->name('front.products.show');
+
+// Not behind `auth` — a guest must be able to build up a cart (stored in a
+// cookie) before ever creating an account.
+Route::get('/cart', [CartController::class, 'show'])->name('front.cart.show');
+Route::post('/cart/add', [CartController::class, 'add'])->name('front.cart.add');
+Route::post('/cart/update', [CartController::class, 'update'])->name('front.cart.update');
+Route::post('/cart/remove', [CartController::class, 'remove'])->name('front.cart.remove');
+
+Route::view('/checkout', 'front.checkout.coming-soon')->name('front.checkout');
 
 Route::middleware('guest')->group(function () {
     Route::get('/register', [RegisterController::class, 'create'])->name('front.register');

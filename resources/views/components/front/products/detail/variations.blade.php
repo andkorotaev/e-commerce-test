@@ -88,14 +88,28 @@
         </div>
     </div>
 
+    @if (session('status') === 'added-to-cart')
+        <p class="bg-stone/10 px-4 py-3 text-sm text-ink/70">
+            Товар додано в кошик.
+            <a href="{{ route('front.cart.show') }}" class="underline decoration-dotted underline-offset-4 hover:text-ink">Перейти в кошик →</a>
+        </p>
+    @endif
+
     <div class="flex flex-col gap-3 sm:flex-row">
-        <button
-            type="button"
-            data-add-to-cart
-            class="flex-1 bg-ink px-6 py-3 font-mono text-xs uppercase tracking-widest text-bone transition-colors hover:bg-madder disabled:cursor-not-allowed disabled:bg-stone"
-        >
-            <span data-add-to-cart-label>Додати в кошик</span>
-        </button>
+        <form method="POST" action="{{ route('front.cart.add') }}" data-cart-add-form class="flex-1">
+            @csrf
+            <input type="hidden" name="product_id" value="{{ $product->id }}">
+            <input type="hidden" name="variant_id" data-cart-variant-input value="">
+            <input type="hidden" name="quantity" data-cart-quantity-input value="1">
+
+            <button
+                type="submit"
+                data-add-to-cart
+                class="w-full bg-ink px-6 py-3 font-mono text-xs uppercase tracking-widest text-bone transition-colors hover:bg-madder disabled:cursor-not-allowed disabled:bg-stone"
+            >
+                Додати в кошик
+            </button>
+        </form>
         @auth
             <form method="POST" action="{{ route('front.wishlist.toggle', $product->id) }}">
                 @csrf

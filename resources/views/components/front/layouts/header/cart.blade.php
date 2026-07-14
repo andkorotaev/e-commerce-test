@@ -1,7 +1,7 @@
 @props(['dark' => false, 'count' => 0])
 
 <a
-    href="#"
+    href="{{ route('front.cart.show') }}"
     aria-label="{{ __('header.cart') }}"
     class="relative inline-flex items-center {{ $dark ? 'text-bone/75 hover:text-bone' : 'text-ink/70 hover:text-ink' }} transition-colors duration-200"
 >
