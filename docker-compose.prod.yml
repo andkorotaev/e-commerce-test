@@ -3,6 +3,10 @@
 # never committed, created once by hand during server provisioning.
 # IMAGE/TAG are exported into the shell by the deploy workflow before `docker compose`
 # runs, so they don't need to live in that .env file.
+#
+# app's port is bound to localhost only — the host's own nginx (shared with other
+# projects on this box) terminates TLS and reverse-proxies to it, it never faces
+# the internet directly.
 
 services:
   app:
@@ -10,7 +14,7 @@ services:
     restart: unless-stopped
     env_file: .env
     ports:
-      - '80:80'
+      - '127.0.0.1:8080:80'
     volumes:
       - storage-app:/var/www/html/storage/app
       - storage-logs:/var/www/html/storage/logs
