@@ -3,13 +3,14 @@
 namespace App\Dto\Product;
 
 use App\Dto\ProductVariant\ProductVariantInputDto;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
 
 final readonly class ProductInputDto
 {
     /**
      * @param  Collection<int, ProductTranslationDto>  $translations
-     * @param  Collection<int, \Illuminate\Http\UploadedFile>  $newImages
+     * @param  Collection<int, UploadedFile>  $newImages
      * @param  Collection<int, int>  $deleteImageIds
      * @param  Collection<int, ProductVariantInputDto>  $variants
      */

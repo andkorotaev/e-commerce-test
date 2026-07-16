@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Front;
 
+use App\Models\Order;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
@@ -20,7 +21,7 @@ class ErrorPagesTest extends TestCase
 
     public function test_forbidden_request_shows_the_branded_403_page(): void
     {
-        $order = \App\Models\Order::factory()->create(['user_id' => null]);
+        $order = Order::factory()->create(['user_id' => null]);
 
         $response = $this->get(route('front.checkout.thank-you', $order->id));
 

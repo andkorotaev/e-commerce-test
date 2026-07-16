@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Front;
 
+use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -102,7 +103,7 @@ class CheckoutTest extends TestCase
             'total' => 1000 + 150, // 2 * 500 + flat shipping fee (below free-shipping threshold)
         ]);
 
-        $order = \App\Models\Order::first();
+        $order = Order::first();
         $this->assertDatabaseHas('order_items', [
             'order_id' => $order->id,
             'product_id' => $product->id,
@@ -200,7 +201,7 @@ class CheckoutTest extends TestCase
         $this->addProductToCart();
         $this->post(route('front.checkout.store'), $this->validPayload());
 
-        $order = \App\Models\Order::first();
+        $order = Order::first();
         $response = $this->get(route('front.checkout.thank-you', $order->id));
 
         $response->assertOk();
@@ -214,7 +215,7 @@ class CheckoutTest extends TestCase
         // test's session was never involved in placing it, which is the
         // scenario the guard exists for (a visitor guessing/sharing an
         // order URL rather than genuinely having just placed it).
-        $order = \App\Models\Order::factory()->create(['user_id' => null]);
+        $order = Order::factory()->create(['user_id' => null]);
 
         $response = $this->get(route('front.checkout.thank-you', $order->id));
 
@@ -224,7 +225,7 @@ class CheckoutTest extends TestCase
     public function test_thank_you_page_returns_403_for_a_logged_in_user_who_does_not_own_it(): void
     {
         $owner = User::factory()->create();
-        $order = \App\Models\Order::factory()->create(['user_id' => $owner->id]);
+        $order = Order::factory()->create(['user_id' => $owner->id]);
 
         $intruder = User::factory()->create();
         $response = $this->actingAs($intruder)->get(route('front.checkout.thank-you', $order->id));
@@ -240,7 +241,7 @@ class CheckoutTest extends TestCase
             'quantity' => 1,
         ]);
         $this->actingAs($user)->post(route('front.checkout.store'), $this->validPayload());
-        $order = \App\Models\Order::first();
+        $order = Order::first();
 
         // A fresh request cycle, still authenticated as the same user.
         $response = $this->actingAs($user)->get(route('front.checkout.thank-you', $order->id));
@@ -260,7 +261,7 @@ class CheckoutTest extends TestCase
         $response = $this->actingAs($user)->get(route('front.account.orders'));
 
         $response->assertOk();
-        $order = \App\Models\Order::first();
+        $order = Order::first();
         $response->assertSee('OCRE-'.str_pad((string) $order->id, 6, '0', STR_PAD_LEFT));
     }
 }

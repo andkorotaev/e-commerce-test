@@ -9,6 +9,7 @@ use App\Models\ProductAttribute;
 use App\Models\ProductAttributeValue;
 use App\Models\ProductVariant;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class ProductListingTest extends TestCase
@@ -33,7 +34,7 @@ class ProductListingTest extends TestCase
         if ($name !== null) {
             $product->translations()->where('locale', 'uk')->update([
                 'name' => $name,
-                'slug' => \Illuminate\Support\Str::slug($name),
+                'slug' => Str::slug($name),
             ]);
         }
 

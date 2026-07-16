@@ -47,8 +47,8 @@ class WishlistRepository
 
     /**
      * @return Collection<int, int> every wishlisted product id for a user —
-     *                               used by the product page to mark whether
-     *                               the current product is already saved.
+     *                              used by the product page to mark whether
+     *                              the current product is already saved.
      */
     public function productIdsForUser(int $userId): Collection
     {

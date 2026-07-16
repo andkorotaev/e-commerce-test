@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Dto\Product\ProductDto;
 use App\Dto\Product\ProductInputDto;
+use App\Dto\Product\ProductListItemDto;
 use App\Dto\ProductVariant\ProductVariantInputDto;
 use App\Repositories\ProductImageRepository;
 use App\Repositories\ProductRepository;
@@ -52,7 +53,7 @@ class ProductService
     }
 
     /**
-     * @return Collection<int, \App\Dto\Product\ProductListItemDto>
+     * @return Collection<int, ProductListItemDto>
      */
     public function similarTo(ProductDto $product, int $limit = 8): Collection
     {
@@ -60,7 +61,7 @@ class ProductService
     }
 
     /**
-     * @return Collection<int, \App\Dto\Product\ProductListItemDto>
+     * @return Collection<int, ProductListItemDto>
      */
     public function newArrivals(int $limit = 10): Collection
     {
@@ -68,7 +69,7 @@ class ProductService
     }
 
     /**
-     * @return Collection<int, \App\Dto\Product\ProductListItemDto>
+     * @return Collection<int, ProductListItemDto>
      */
     public function popular(int $limit = 8): Collection
     {
