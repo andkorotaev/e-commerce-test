@@ -25,7 +25,8 @@ COPY --from=assets /app/public/build public/build
 
 RUN composer install --no-dev --optimize-autoloader --no-interaction --no-progress --no-scripts \
     && php artisan package:discover --ansi \
-    && chown -R www-data:www-data storage bootstrap/cache
+    && php artisan storage:link \
+    && chown -R www-data:www-data storage bootstrap/cache public/storage
 
 COPY docker/nginx/default.conf /etc/nginx/http.d/default.conf
 COPY docker/supervisor/supervisord.conf /etc/supervisor/supervisord.conf
