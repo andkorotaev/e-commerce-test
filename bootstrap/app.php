@@ -11,6 +11,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // App only ever receives traffic from this box's own nginx (reverse proxy
+        // terminating TLS, port 8080 bound to 127.0.0.1) — trusting all proxies is
+        // safe here and lets X-Forwarded-Proto mark the request as HTTPS.
+        $middleware->trustProxies(at: '*');
+
         $middleware->redirectGuestsTo(function ($request) {
             return $request->is('admin*')
                 ? route('admin.login')
