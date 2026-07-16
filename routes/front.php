@@ -8,7 +8,9 @@ use App\Http\Controllers\Front\Auth\ResetPasswordController;
 use App\Http\Controllers\Front\CartController;
 use App\Http\Controllers\Front\CategoryController;
 use App\Http\Controllers\Front\CheckoutController;
+use App\Http\Controllers\Front\CityController;
 use App\Http\Controllers\Front\ContactController;
+use App\Http\Controllers\Front\DeliveryPointController;
 use App\Http\Controllers\Front\HomeController;
 use App\Http\Controllers\Front\ProductController;
 use App\Http\Controllers\Front\ReviewController;
@@ -41,6 +43,8 @@ Route::post('/cart/remove', [CartController::class, 'remove'])->name('front.cart
 // "create an account" checkbox handled inside the controller/service).
 Route::get('/checkout', [CheckoutController::class, 'show'])->name('front.checkout');
 Route::post('/checkout', [CheckoutController::class, 'store'])->name('front.checkout.store');
+Route::get('/checkout/cities', [CityController::class, 'index'])->name('front.checkout.cities');
+Route::get('/checkout/delivery-points', [DeliveryPointController::class, 'index'])->name('front.checkout.delivery-points');
 Route::get('/order/{order}/thank-you', [CheckoutController::class, 'thankYou'])->name('front.checkout.thank-you');
 
 Route::middleware('guest')->group(function () {

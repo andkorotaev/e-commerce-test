@@ -17,7 +17,9 @@
                     <div class="flex justify-between gap-4"><dt class="text-ink/50">Phone</dt><dd class="text-ink">{{ $order->phone }}</dd></div>
                     <div class="flex justify-between gap-4"><dt class="text-ink/50">Email</dt><dd class="text-ink">{{ $order->email }}</dd></div>
                     <div class="flex justify-between gap-4"><dt class="text-ink/50">City</dt><dd class="text-ink">{{ $order->city }}</dd></div>
-                    <div class="flex justify-between gap-4"><dt class="text-ink/50">Address</dt><dd class="text-ink text-right">{{ $order->address }}</dd></div>
+                    @if ($order->address)
+                        <div class="flex justify-between gap-4"><dt class="text-ink/50">Address</dt><dd class="text-ink text-right">{{ $order->address }}</dd></div>
+                    @endif
                     @if ($order->comment)
                         <div class="flex justify-between gap-4"><dt class="text-ink/50">Comment</dt><dd class="text-ink text-right">{{ $order->comment }}</dd></div>
                     @endif

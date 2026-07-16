@@ -35,6 +35,7 @@ class CheckoutController extends Controller
                 'first_name' => $nameParts[0] ?? '',
                 'last_name' => $nameParts[1] ?? '',
                 'email' => $user?->email ?? '',
+                'phone' => $user?->phone ?? '',
             ],
         ]);
     }

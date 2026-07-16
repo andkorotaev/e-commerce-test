@@ -33,7 +33,7 @@
             <input
                 type="tel"
                 name="phone"
-                value="{{ old('phone') }}"
+                value="{{ old('phone', $prefill['phone'] ?? '') }}"
                 required
                 placeholder="+380 XX XXX XX XX"
                 class="w-full border border-stone bg-transparent px-3 py-2 text-sm text-ink focus:border-ink focus:outline-none"
@@ -51,36 +51,6 @@
                 class="w-full border border-stone bg-transparent px-3 py-2 text-sm text-ink focus:border-ink focus:outline-none"
             >
             @error('email') <p class="mt-1 text-xs text-madder">{{ $message }}</p> @enderror
-        </div>
-
-        <div>
-            <label class="mb-1 block font-mono text-xs uppercase tracking-widest text-ink/40">Місто</label>
-            <input
-                type="text"
-                name="city"
-                list="ukraine-cities"
-                value="{{ old('city') }}"
-                required
-                class="w-full border border-stone bg-transparent px-3 py-2 text-sm text-ink focus:border-ink focus:outline-none"
-            >
-            <datalist id="ukraine-cities">
-                @foreach (config('ukraine_cities.cities') as $city)
-                    <option value="{{ $city }}"></option>
-                @endforeach
-            </datalist>
-            @error('city') <p class="mt-1 text-xs text-madder">{{ $message }}</p> @enderror
-        </div>
-
-        <div>
-            <label class="mb-1 block font-mono text-xs uppercase tracking-widest text-ink/40">Адреса</label>
-            <input
-                type="text"
-                name="address"
-                value="{{ old('address') }}"
-                required
-                class="w-full border border-stone bg-transparent px-3 py-2 text-sm text-ink focus:border-ink focus:outline-none"
-            >
-            @error('address') <p class="mt-1 text-xs text-madder">{{ $message }}</p> @enderror
         </div>
     </div>
 

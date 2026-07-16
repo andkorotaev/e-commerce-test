@@ -27,7 +27,7 @@ class CheckoutRequest extends FormRequest
             'phone' => ['required', 'string', 'regex:/^\+?[0-9\s\-\(\)]{7,20}$/'],
             'email' => ['required', 'email', 'max:255'],
             'city' => ['required', 'string', 'max:100'],
-            'address' => ['required', 'string', 'max:255'],
+            'address' => ['nullable', 'required_if:delivery_type,address', 'string', 'max:255'],
             'comment' => ['nullable', 'string', 'max:1000'],
 
             'delivery_carrier' => ['required', Rule::in(array_keys(config('shop.delivery_carriers')))],

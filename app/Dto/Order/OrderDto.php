@@ -20,7 +20,7 @@ final readonly class OrderDto
         public string $phone,
         public string $email,
         public string $city,
-        public string $address,
+        public ?string $address,
         public ?string $comment,
         public string $deliveryCarrier,
         public string $deliveryType,

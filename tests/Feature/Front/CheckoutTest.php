@@ -6,11 +6,27 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class CheckoutTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // The checkout page's delivery section calls CityLookupService live,
+        // which otherwise hits the real Overpass API on every test run —
+        // faked so these tests stay fast, deterministic, and don't depend on
+        // outbound network access (e.g. in CI).
+        Http::fake([
+            'overpass-api.de/*' => Http::response([
+                'elements' => [['tags' => ['name' => 'Київ']]],
+            ], 200),
+        ]);
+    }
 
     /**
      * @return array<string, mixed>
@@ -74,7 +90,7 @@ class CheckoutTest extends TestCase
 
     public function test_checkout_page_prefills_name_and_email_from_the_authenticated_user(): void
     {
-        $user = User::factory()->create(['name' => 'Іван Франко', 'email' => 'ivan@example.com']);
+        $user = User::factory()->create(['name' => 'Іван Франко', 'email' => 'ivan@example.com', 'phone' => '+380671112233']);
         $this->actingAs($user)->post(route('front.cart.add'), [
             'product_id' => Product::factory()->create(['price' => 300, 'stock' => 5])->id,
             'quantity' => 1,
@@ -86,6 +102,7 @@ class CheckoutTest extends TestCase
         $response->assertSee('value="Іван"', false);
         $response->assertSee('value="Франко"', false);
         $response->assertSee('value="ivan@example.com"', false);
+        $response->assertSee('value="+380671112233"', false);
     }
 
     public function test_guest_can_place_an_order(): void
@@ -163,6 +180,29 @@ class CheckoutTest extends TestCase
 
         $response->assertSessionDoesntHaveErrors('delivery_point');
         $this->assertDatabaseHas('orders', ['delivery_type' => 'address', 'delivery_point' => null]);
+    }
+
+    public function test_address_is_required_for_courier_delivery(): void
+    {
+        $this->addProductToCart();
+
+        $response = $this->post(route('front.checkout.store'), $this->validPayload([
+            'delivery_type' => 'address',
+            'delivery_point' => null,
+            'address' => null,
+        ]));
+
+        $response->assertSessionHasErrors('address');
+    }
+
+    public function test_address_is_not_required_for_branch_delivery(): void
+    {
+        $this->addProductToCart();
+
+        $response = $this->post(route('front.checkout.store'), $this->validPayload(['address' => null]));
+
+        $response->assertSessionDoesntHaveErrors('address');
+        $this->assertDatabaseHas('orders', ['delivery_type' => 'branch', 'address' => null]);
     }
 
     public function test_guest_checking_create_account_creates_and_logs_in_a_new_user(): void
