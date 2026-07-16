@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\ContactMessageController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductAttributeController;
 use App\Http\Controllers\Admin\ProductController;
@@ -42,6 +43,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('reviews', [ReviewController::class, 'index'])->name('reviews.index');
         Route::post('reviews/{reviewId}/approve', [ReviewController::class, 'approve'])->name('reviews.approve');
         Route::delete('reviews/{reviewId}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
+
+        Route::get('contact-messages', [ContactMessageController::class, 'index'])->name('contact-messages.index');
+        Route::delete('contact-messages/{messageId}', [ContactMessageController::class, 'destroy'])->name('contact-messages.destroy');
 
         Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
         Route::get('orders/{orderId}', [OrderController::class, 'show'])->name('orders.show');

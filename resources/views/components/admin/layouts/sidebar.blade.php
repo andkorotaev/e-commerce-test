@@ -8,6 +8,7 @@
         ['label' => 'Brands', 'route' => 'admin.brands.index', 'active' => request()->routeIs('admin.brands.*')],
         ['label' => 'Attributes', 'route' => 'admin.product-attributes.index', 'active' => request()->routeIs('admin.product-attributes.*')],
         ['label' => 'Reviews', 'route' => 'admin.reviews.index', 'active' => request()->routeIs('admin.reviews.*')],
+        ['label' => 'Contact messages', 'route' => 'admin.contact-messages.index', 'active' => request()->routeIs('admin.contact-messages.*')],
     ];
 @endphp
 
