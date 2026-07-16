@@ -3,5 +3,5 @@
     <x-front.home.new-arrivals :products="$newArrivals" />
     <x-front.home.popular-products :products="$popularProducts" />
     <x-front.home.categories :categories="$categories" />
-    <x-front.home.benefits />
+    <x-front.benefits />
 </x-front.layouts.layout>

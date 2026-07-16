@@ -8,14 +8,18 @@
                 <p class="mt-3 max-w-xs text-sm text-bone/50">
                     Малі партії, натуральні барвники — індиго, волоський горіх, кошеніль, резеда.
                 </p>
+                <ul class="mt-4 space-y-2 text-sm">
+                    <li><a href="{{ route('front.about') }}" class="transition-colors hover:text-bone">Про магазин</a></li>
+                    <li><a href="{{ route('front.contact') }}" class="transition-colors hover:text-bone">Контакти</a></li>
+                </ul>
             </div>
 
             <div>
                 <h3 class="mb-4 font-mono text-xs uppercase tracking-widest text-bone/40">Контакти</h3>
                 <ul class="space-y-2 text-sm">
-                    <li><a href="mailto:hello@ocre.ua" class="transition-colors hover:text-bone">hello@ocre.ua</a></li>
-                    <li><a href="tel:+380441234567" class="transition-colors hover:text-bone">+380 44 123 45 67</a></li>
-                    <li class="text-bone/50">Київ, вул. Хрещатик, 1</li>
+                    <li><a href="mailto:{{ config('shop.contact.email') }}" class="transition-colors hover:text-bone">{{ config('shop.contact.email') }}</a></li>
+                    <li><a href="tel:{{ config('shop.contact.phone') }}" class="transition-colors hover:text-bone">{{ config('shop.contact.phone_display') }}</a></li>
+                    <li class="text-bone/50">{{ config('shop.contact.address') }}</li>
                 </ul>
             </div>
 

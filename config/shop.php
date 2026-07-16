@@ -80,4 +80,25 @@ return [
         'cancelled' => 'Скасовано',
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Contact details
+    |--------------------------------------------------------------------------
+    |
+    | The single source of truth for the store's public contact info — the
+    | footer and the "Contacts" page both read from here, so the address/
+    | phone/email shown in each can never drift apart. map_query is a plain
+    | address string handed to Google's no-API-key embed endpoint
+    | (google.com/maps?q=...&output=embed), not coordinates.
+    |
+    */
+
+    'contact' => [
+        'email' => 'hello@ocre.ua',
+        'phone' => '+380441234567',
+        'phone_display' => '+380 44 123 45 67',
+        'address' => 'Київ, вул. Хрещатик, 1',
+        'map_query' => 'Київ, вул. Хрещатик, 1',
+    ],
+
 ];
