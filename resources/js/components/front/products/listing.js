@@ -1,3 +1,5 @@
+import { attachAutocomplete } from '../../../autocomplete';
+
 export function init(root) {
     const form = root.querySelector('[data-products-form]');
     const countEl = root.querySelector('[data-products-count]');
@@ -5,6 +7,8 @@ export function init(root) {
     if (!form) {
         return;
     }
+
+    attachAutocomplete(form.querySelector('[data-suggest-url]'));
 
     const productsUrl = form.dataset.productsUrl;
     let gridEl = root.querySelector('[data-products-grid]');

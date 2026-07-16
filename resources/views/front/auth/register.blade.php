@@ -1,4 +1,4 @@
-<x-front.layouts.layout title="Реєстрація">
+<x-front.layouts.layout title="Реєстрація" description="Створіть акаунт OCRE, щоб зберігати список бажань та відстежувати замовлення.">
     <div class="mx-auto flex max-w-sm flex-col px-4 py-20">
         <h1 class="mb-8 font-serif text-3xl text-ink">Реєстрація</h1>
 

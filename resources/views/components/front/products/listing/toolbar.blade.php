@@ -6,14 +6,17 @@
     </div>
 
     <div class="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
-        <input
-            type="search"
-            name="search"
-            value="{{ $filters->search }}"
-            data-debounce
-            placeholder="Пошук товарів…"
-            class="w-full border border-stone bg-transparent px-3 py-2 text-sm text-ink placeholder:text-ink/30 focus:border-ink focus:outline-none sm:max-w-xs"
-        >
+        <div class="w-full sm:max-w-xs">
+            <input
+                type="search"
+                name="search"
+                value="{{ $filters->search }}"
+                data-debounce
+                data-suggest-url="{{ route('front.search.suggest') }}"
+                placeholder="Пошук товарів…"
+                class="w-full border border-stone bg-transparent px-3 py-2 text-sm text-ink placeholder:text-ink/30 focus:border-ink focus:outline-none"
+            >
+        </div>
 
         <select
             name="sort"

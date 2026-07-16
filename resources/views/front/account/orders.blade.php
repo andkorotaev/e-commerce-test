@@ -1,4 +1,4 @@
-<x-front.layouts.layout title="Історія замовлень">
+<x-front.layouts.layout title="Історія замовлень" description="Історія ваших замовлень в OCRE.">
     <x-front.account.layout title="Історія замовлень">
         @if ($orders->isEmpty())
             <p class="font-mono text-xs uppercase tracking-widest text-ink/40">

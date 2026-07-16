@@ -1,4 +1,7 @@
-<x-front.layouts.layout title="Контакти">
+<x-front.layouts.layout
+    title="Контакти"
+    description="Адреса, телефон, email та форма зворотного зв'язку OCRE."
+>
     <div class="mx-auto max-w-6xl px-4 py-16 md:px-10 md:py-20">
         <p class="font-mono text-xs uppercase tracking-widest text-stone">Контакти</p>
         <h1 class="mt-2 mb-10 font-serif text-4xl text-ink md:text-5xl">Зв'яжіться з нами</h1>

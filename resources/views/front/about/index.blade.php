@@ -1,4 +1,8 @@
-<x-front.layouts.layout title="Про магазин">
+<x-front.layouts.layout
+    title="Про магазин"
+    description="Історія, місія та переваги OCRE — одягу малих партій, забарвленого натуральними барвниками."
+    image="home/hero-1.jpg"
+>
     <section class="mx-auto max-w-3xl px-4 py-16 text-center md:px-10 md:py-20">
         <p class="font-mono text-xs uppercase tracking-widest text-stone">Про магазин</p>
         <h1 class="mt-3 font-serif text-4xl text-ink md:text-5xl">OCRE — одяг, забарвлений землею</h1>

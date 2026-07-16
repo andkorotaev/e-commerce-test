@@ -1,4 +1,4 @@
-<x-front.layouts.layout title="Профіль">
+<x-front.layouts.layout title="Профіль" description="Перегляд і редагування даних вашого профілю OCRE.">
     <x-front.account.layout title="Профіль">
         @if (session('status') === 'profile-updated')
             <p class="mb-6 bg-stone/10 px-4 py-3 text-sm text-ink/70">Дані оновлено.</p>

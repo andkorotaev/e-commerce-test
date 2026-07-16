@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('front.home');
 Route::get('/search', [SearchController::class, 'index'])->name('front.search');
+Route::get('/search/suggest', [SearchController::class, 'suggest'])->name('front.search.suggest');
 
 // Purely static informational pages — no data to fetch, so a view route
 // is enough (mirrors HomeController's own note that a controller is only

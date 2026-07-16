@@ -1,4 +1,4 @@
-<x-front.layouts.layout title="Дякуємо за замовлення">
+<x-front.layouts.layout title="Дякуємо за замовлення" description="Ваше замовлення в OCRE успішно оформлено.">
     <div class="mx-auto flex max-w-lg flex-col items-center px-4 py-24 text-center">
         <h1 class="mb-4 font-serif text-4xl text-ink">Дякуємо за замовлення!</h1>
         <p class="mb-2 text-sm text-ink/60">Номер вашого замовлення</p>

@@ -11,9 +11,16 @@
             'url' => $index === $lastIndex ? null : route('front.categories.show', $node->translation($locale)?->slug),
         ])
         ->prepend(['label' => 'Головна', 'url' => route('front.home')]);
+
+    $metaDescription = $translation?->metaDescription
+        ?? ($translation?->description ? \Illuminate\Support\Str::limit($translation->description, 160) : null);
 @endphp
 
-<x-front.layouts.layout :title="$translation?->name">
+<x-front.layouts.layout
+    :title="$translation?->name"
+    :description="$metaDescription"
+    :image="$category->image"
+>
     @if ($category->image)
         <div class="h-40 w-full overflow-hidden md:h-56">
             <img

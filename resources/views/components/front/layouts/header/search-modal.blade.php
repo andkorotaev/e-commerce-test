@@ -16,14 +16,17 @@
                 <line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
 
-            <input
-                type="search"
-                name="q"
-                data-search-modal-input
-                placeholder="Пошук товарів…"
-                autocomplete="off"
-                class="flex-1 border-b border-stone bg-transparent py-2 font-serif text-xl text-ink placeholder:text-ink/30 focus:border-ink focus:outline-none"
-            >
+            <div class="flex-1">
+                <input
+                    type="search"
+                    name="q"
+                    data-search-modal-input
+                    data-suggest-url="{{ route('front.search.suggest') }}"
+                    placeholder="Пошук товарів…"
+                    autocomplete="off"
+                    class="w-full border-b border-stone bg-transparent py-2 font-serif text-xl text-ink placeholder:text-ink/30 focus:border-ink focus:outline-none"
+                >
+            </div>
 
             <button
                 type="submit"

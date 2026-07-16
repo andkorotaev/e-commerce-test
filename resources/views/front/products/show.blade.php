@@ -1,6 +1,14 @@
-@php $translation = $product->translation(app()->getLocale()); @endphp
+@php
+    $translation = $product->translation(app()->getLocale());
+    $metaDescription = $translation?->metaDescription
+        ?? ($translation?->description ? \Illuminate\Support\Str::limit($translation->description, 160) : null);
+@endphp
 
-<x-front.layouts.layout :title="$translation?->name">
+<x-front.layouts.layout
+    :title="$translation?->name"
+    :description="$metaDescription"
+    :image="$product->primaryImage()?->path"
+>
     <x-front.products.detail
         :product="$product"
         :brand="$brand"

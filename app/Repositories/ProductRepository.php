@@ -303,6 +303,32 @@ class ProductRepository
     }
 
     /**
+     * Lean, non-paginated version of search() — the header/catalog search
+     * inputs' live autocomplete dropdown. Deliberately capped small and
+     * returns the same lean ProductListItemDto shape rather than inventing
+     * a separate "suggestion" shape.
+     *
+     * @return Collection<int, ProductListItemDto>
+     */
+    public function searchSuggestions(string $query, int $limit): Collection
+    {
+        $locale = app()->getLocale();
+
+        return Product::where('is_active', true)
+            ->whereHas('translations', function ($q) use ($query, $locale) {
+                $q->where('locale', $locale)->where('name', 'like', '%'.$query.'%');
+            })
+            ->with([
+                'translations' => fn ($q) => $q->where('locale', $locale),
+                'images' => fn ($q) => $q->orderBy('sort_order')->limit(1),
+            ])
+            ->orderBy('sort_order')
+            ->limit($limit)
+            ->get()
+            ->map(fn (Product $product) => ProductListItemDto::fromModel($product, $locale));
+    }
+
+    /**
      * @param  array<string, mixed>  $attributes
      */
     public function create(array $attributes): ProductDto

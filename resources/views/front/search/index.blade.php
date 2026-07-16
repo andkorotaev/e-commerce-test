@@ -1,4 +1,7 @@
-<x-front.layouts.layout :title="$query !== '' ? 'Пошук: '.$query : 'Пошук'">
+<x-front.layouts.layout
+    :title="$query !== '' ? 'Пошук: '.$query : 'Пошук'"
+    :description="$query !== '' ? 'Результати пошуку за запитом «'.$query.'» в каталозі OCRE.' : 'Пошук товарів у каталозі OCRE.'"
+>
     <div class="mx-auto max-w-6xl px-4 py-12 md:px-10">
         <h1 class="mb-2 font-serif text-3xl text-ink">Пошук</h1>
 

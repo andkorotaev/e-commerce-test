@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductAttributeController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ReviewController;
+use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -45,5 +46,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
         Route::get('orders/{orderId}', [OrderController::class, 'show'])->name('orders.show');
         Route::put('orders/{orderId}/status', [OrderController::class, 'updateStatus'])->name('orders.status');
+
+        Route::get('users', [UserController::class, 'index'])->name('users.index');
+        Route::get('users/{userId}', [UserController::class, 'show'])->name('users.show');
     });
 });

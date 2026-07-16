@@ -1,4 +1,4 @@
-<x-front.layouts.layout title="Вхід">
+<x-front.layouts.layout title="Вхід" description="Увійдіть до свого акаунту OCRE.">
     <div class="mx-auto flex max-w-sm flex-col px-4 py-20">
         <h1 class="mb-8 font-serif text-3xl text-ink">Вхід</h1>
 

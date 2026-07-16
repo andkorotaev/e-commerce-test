@@ -1,4 +1,4 @@
-<x-front.layouts.layout title="Новий пароль">
+<x-front.layouts.layout title="Новий пароль" description="Встановіть новий пароль для вашого акаунту OCRE.">
     <div class="mx-auto flex max-w-sm flex-col px-4 py-20">
         <h1 class="mb-8 font-serif text-3xl text-ink">Новий пароль</h1>
 

@@ -1,3 +1,5 @@
+import { attachAutocomplete } from '../../../../autocomplete';
+
 export function init(root) {
     const backdrop = root.querySelector('[data-search-modal-backdrop]');
     const panel = root.querySelector('[data-search-modal-panel]');
@@ -8,6 +10,8 @@ export function init(root) {
     if (!backdrop || !panel) {
         return;
     }
+
+    attachAutocomplete(input);
 
     let isOpen = false;
 
