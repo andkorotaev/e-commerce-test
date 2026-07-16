@@ -27,7 +27,7 @@ Route::get('/search/suggest', [SearchController::class, 'suggest'])->name('front
 // worth promoting to once a route genuinely needs to fetch something).
 Route::view('/about', 'front.about.index')->name('front.about');
 Route::view('/contacts', 'front.contact.index')->name('front.contact');
-Route::post('/contacts', [ContactController::class, 'store'])->name('front.contact.store');
+Route::post('/contacts', [ContactController::class, 'store'])->middleware('throttle:5,1')->name('front.contact.store');
 Route::get('/catalog/{slug}/products', [CategoryController::class, 'products'])->name('front.categories.products');
 Route::get('/catalog/{slug}', [CategoryController::class, 'show'])->name('front.categories.show');
 Route::get('/product/{slug}', [ProductController::class, 'show'])->name('front.products.show');
@@ -42,14 +42,14 @@ Route::post('/cart/remove', [CartController::class, 'remove'])->name('front.cart
 // Not behind `auth` — a guest can check out too (with an optional
 // "create an account" checkbox handled inside the controller/service).
 Route::get('/checkout', [CheckoutController::class, 'show'])->name('front.checkout');
-Route::post('/checkout', [CheckoutController::class, 'store'])->name('front.checkout.store');
+Route::post('/checkout', [CheckoutController::class, 'store'])->middleware('throttle:10,1')->name('front.checkout.store');
 Route::get('/checkout/cities', [CityController::class, 'index'])->name('front.checkout.cities');
 Route::get('/checkout/delivery-points', [DeliveryPointController::class, 'index'])->name('front.checkout.delivery-points');
 Route::get('/order/{order}/thank-you', [CheckoutController::class, 'thankYou'])->name('front.checkout.thank-you');
 
 Route::middleware('guest')->group(function () {
     Route::get('/register', [RegisterController::class, 'create'])->name('front.register');
-    Route::post('/register', [RegisterController::class, 'store'])->name('front.register.store');
+    Route::post('/register', [RegisterController::class, 'store'])->middleware('throttle:5,1')->name('front.register.store');
     Route::get('/login', [LoginController::class, 'create'])->name('front.login');
     Route::post('/login', [LoginController::class, 'store'])->name('front.login.store');
     Route::get('/forgot-password', [ForgotPasswordController::class, 'create'])->name('front.password.request');
@@ -60,7 +60,7 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [LoginController::class, 'destroy'])->name('front.logout');
-    Route::post('/product/{slug}/reviews', [ReviewController::class, 'store'])->name('front.reviews.store');
+    Route::post('/product/{slug}/reviews', [ReviewController::class, 'store'])->middleware('throttle:5,1')->name('front.reviews.store');
     Route::post('/wishlist/{productId}/toggle', [WishlistController::class, 'toggle'])->name('front.wishlist.toggle');
 
     Route::prefix('account')->name('front.account.')->group(function () {

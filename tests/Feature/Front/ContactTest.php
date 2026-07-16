@@ -54,6 +54,23 @@ class ContactTest extends TestCase
         $this->assertDatabaseCount('contact_messages', 0);
     }
 
+    public function test_contact_form_is_rate_limited(): void
+    {
+        $payload = [
+            'name' => 'Іван Іванов',
+            'email' => 'ivan@example.com',
+            'message' => 'Питання щодо замовлення.',
+        ];
+
+        for ($i = 0; $i < 5; $i++) {
+            $this->post(route('front.contact.store'), $payload);
+        }
+
+        $response = $this->post(route('front.contact.store'), $payload);
+
+        $response->assertStatus(429);
+    }
+
     public function test_contact_form_prefills_name_and_email_for_logged_in_user(): void
     {
         $user = User::factory()->create(['name' => 'Марія Коваль', 'email' => 'maria@example.com']);

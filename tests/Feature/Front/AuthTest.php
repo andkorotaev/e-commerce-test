@@ -74,6 +74,29 @@ class AuthTest extends TestCase
         $this->assertGuest();
     }
 
+    public function test_registration_is_rate_limited(): void
+    {
+        $payload = [
+            'first_name' => 'Тест',
+            'phone' => '+380501234567',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+        ];
+
+        for ($i = 0; $i < 5; $i++) {
+            $this->post(route('front.register.store'), [...$payload, 'email' => "user{$i}@example.com"]);
+            // Registering immediately logs the new user in, and the route is
+            // behind `guest` middleware — without logging back out, the next
+            // attempt would be redirected by `guest` before ever reaching the
+            // throttle check, and the limit would never actually get hit.
+            $this->post(route('front.logout'));
+        }
+
+        $response = $this->post(route('front.register.store'), [...$payload, 'email' => 'oneMore@example.com']);
+
+        $response->assertStatus(429);
+    }
+
     public function test_login_page_can_be_rendered(): void
     {
         $this->get(route('front.login'))->assertOk();

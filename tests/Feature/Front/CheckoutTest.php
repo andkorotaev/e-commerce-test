@@ -304,4 +304,15 @@ class CheckoutTest extends TestCase
         $order = Order::first();
         $response->assertSee('OCRE-'.str_pad((string) $order->id, 6, '0', STR_PAD_LEFT));
     }
+
+    public function test_checkout_is_rate_limited(): void
+    {
+        for ($i = 0; $i < 10; $i++) {
+            $this->post(route('front.checkout.store'), $this->validPayload());
+        }
+
+        $response = $this->post(route('front.checkout.store'), $this->validPayload());
+
+        $response->assertStatus(429);
+    }
 }

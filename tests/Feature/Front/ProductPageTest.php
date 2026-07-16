@@ -145,6 +145,26 @@ class ProductPageTest extends TestCase
         $response->assertSessionHasErrors(['rating', 'comment']);
     }
 
+    public function test_review_submission_is_rate_limited(): void
+    {
+        $this->productWithSlug('throttle-product');
+        $user = User::factory()->create();
+
+        for ($i = 0; $i < 5; $i++) {
+            $this->actingAs($user)->post(route('front.reviews.store', 'throttle-product'), [
+                'rating' => 5,
+                'comment' => "Comment {$i}",
+            ]);
+        }
+
+        $response = $this->actingAs($user)->post(route('front.reviews.store', 'throttle-product'), [
+            'rating' => 5,
+            'comment' => 'One more comment',
+        ]);
+
+        $response->assertStatus(429);
+    }
+
     public function test_approved_reviews_are_shown_and_rating_stats_are_correct(): void
     {
         $product = $this->productWithSlug('rated-product');
