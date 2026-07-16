@@ -23,7 +23,7 @@ class OrderFactory extends Factory
             'last_name' => fake()->lastName(),
             'phone' => '+380'.fake()->numerify('#########'),
             'email' => fake()->safeEmail(),
-            'city' => fake()->randomElement(config('ukraine_cities.cities')),
+            'city' => fake()->randomElement(['Київ', 'Харків', 'Одеса', 'Дніпро', 'Львів']),
             'address' => fake()->streetAddress(),
             'comment' => null,
             'delivery_carrier' => fake()->randomElement(array_keys(config('shop.delivery_carriers'))),
