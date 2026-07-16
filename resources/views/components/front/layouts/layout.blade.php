@@ -16,6 +16,8 @@
         <title>{{ $pageTitle }}</title>
         <meta name="description" content="{{ $pageDescription }}">
 
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+
         <meta property="og:type" content="{{ $type }}">
         <meta property="og:site_name" content="OCRE">
         <meta property="og:title" content="{{ $pageTitle }}">
