@@ -18,8 +18,10 @@ class RegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
+            'first_name' => ['required', 'string', 'max:255'],
+            'last_name' => ['nullable', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+            'phone' => ['required', 'string', 'regex:/^\+?[0-9\s\-\(\)]{7,20}$/'],
             'password' => ['required', 'confirmed', Password::defaults()],
         ];
     }
@@ -30,8 +32,10 @@ class RegisterRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'name' => "ім'я",
+            'first_name' => "ім'я",
+            'last_name' => 'прізвище',
             'email' => 'email',
+            'phone' => 'телефон',
             'password' => 'пароль',
         ];
     }

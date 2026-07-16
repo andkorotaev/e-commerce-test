@@ -21,15 +21,41 @@ class AuthTest extends TestCase
     public function test_a_user_can_register(): void
     {
         $response = $this->post(route('front.register.store'), [
-            'name' => 'Нова Людина',
+            'first_name' => 'Нова',
+            'last_name' => 'Людина',
             'email' => 'new-user@example.com',
+            'phone' => '+380501234567',
             'password' => 'password123',
             'password_confirmation' => 'password123',
         ]);
 
         $response->assertRedirect(route('front.account.profile'));
         $this->assertAuthenticated();
-        $this->assertDatabaseHas('users', ['email' => 'new-user@example.com']);
+        $this->assertDatabaseHas('users', [
+            'email' => 'new-user@example.com',
+            'first_name' => 'Нова',
+            'last_name' => 'Людина',
+            'phone' => '+380501234567',
+            'name' => 'Нова Людина',
+        ]);
+    }
+
+    public function test_a_user_can_register_without_a_last_name(): void
+    {
+        $response = $this->post(route('front.register.store'), [
+            'first_name' => 'Нова',
+            'email' => 'no-last-name@example.com',
+            'phone' => '+380501234567',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+        ]);
+
+        $response->assertRedirect(route('front.account.profile'));
+        $this->assertDatabaseHas('users', [
+            'email' => 'no-last-name@example.com',
+            'last_name' => null,
+            'name' => 'Нова',
+        ]);
     }
 
     public function test_registration_requires_a_unique_email(): void
@@ -37,8 +63,9 @@ class AuthTest extends TestCase
         User::factory()->create(['email' => 'taken@example.com']);
 
         $response = $this->post(route('front.register.store'), [
-            'name' => 'Дублікат',
+            'first_name' => 'Дублікат',
             'email' => 'taken@example.com',
+            'phone' => '+380501234567',
             'password' => 'password123',
             'password_confirmation' => 'password123',
         ]);
