@@ -7,12 +7,12 @@
 @endphp
 
 <div data-component="front/products/detail/gallery">
-    <div class="aspect-square overflow-hidden bg-stone/10">
+    <div data-gallery-zoom class="relative aspect-square cursor-zoom-in overflow-hidden bg-stone/10">
         <img
             data-gallery-main
             src="{{ $images->isNotEmpty() ? Storage::url($images->first()->path) : '' }}"
             alt="{{ $name }}"
-            class="h-full w-full object-cover"
+            class="h-full w-full object-cover transition-transform duration-300 ease-out"
         >
     </div>
 
