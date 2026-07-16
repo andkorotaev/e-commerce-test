@@ -62,6 +62,15 @@ class CartService
         $this->store()->remove($productId, $variantId);
     }
 
+    /**
+     * Empties the current visitor's cart — called once an order is placed
+     * for it.
+     */
+    public function clear(): void
+    {
+        $this->store()->clear();
+    }
+
     public function summary(): CartSummaryDto
     {
         return CartSummaryDto::fromLines(

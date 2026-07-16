@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Front;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Front\UpdateProfileRequest;
+use App\Services\OrderService;
 use App\Services\WishlistService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -12,7 +13,10 @@ use Illuminate\View\View;
 
 class AccountController extends Controller
 {
-    public function __construct(protected WishlistService $wishlist) {}
+    public function __construct(
+        protected WishlistService $wishlist,
+        protected OrderService $orders,
+    ) {}
 
     public function profile(Request $request): View
     {
@@ -37,15 +41,11 @@ class AccountController extends Controller
         return back()->with('status', 'profile-updated');
     }
 
-    /**
-     * Order history — UI only for now: the storefront has no cart/checkout
-     * flow yet, so no order is ever actually created. This renders the
-     * table shape (number/date/amount/status) with a permanent empty state
-     * rather than backing it with a table nothing writes to.
-     */
-    public function orders(): View
+    public function orders(Request $request): View
     {
-        return view('front.account.orders');
+        return view('front.account.orders', [
+            'orders' => $this->orders->forUser($request->user()->id),
+        ]);
     }
 
     public function wishlist(Request $request): View

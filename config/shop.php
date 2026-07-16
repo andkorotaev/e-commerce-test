@@ -31,4 +31,53 @@ return [
 
     'guest_cart_cookie_minutes' => 60 * 24 * 30,
 
+    /*
+    |--------------------------------------------------------------------------
+    | Checkout
+    |--------------------------------------------------------------------------
+    |
+    | Delivery carriers and payment methods offered at checkout, keyed by
+    | the value stored on the order. Fictional carrier/bank names (this is
+    | a demo store, not integrated with any real logistics or payment API —
+    | selecting one just records the choice, nothing is actually charged or
+    | shipped).
+    |
+    */
+
+    'delivery_carriers' => [
+        'stara_poshta' => 'Стара Пошта',
+        'bitan_poshta' => 'Брітан Пошта',
+    ],
+
+    'delivery_types' => [
+        'branch' => 'У відділення',
+        'postomat' => 'У поштомат',
+        'address' => 'Кур\'єром за адресою',
+    ],
+
+    'payment_methods' => [
+        'stereo_bank' => 'СтереоБанк',
+        'public_bank' => 'ПаблікБанк',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Order statuses
+    |--------------------------------------------------------------------------
+    |
+    | Every order is created as "new" — the others exist here as the label
+    | map for whenever admin-side status management is built; not wiring up
+    | that management yet doesn't mean the display labels shouldn't already
+    | have somewhere honest to live.
+    |
+    */
+
+    'order_statuses' => [
+        'new' => 'Нове',
+        'processing' => 'В обробці',
+        'shipped' => 'Відправлено',
+        'completed' => 'Виконано',
+        'cancelled' => 'Скасовано',
+    ],
+
 ];
