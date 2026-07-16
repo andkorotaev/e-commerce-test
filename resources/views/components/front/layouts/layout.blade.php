@@ -30,10 +30,12 @@
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="bg-bone font-sans text-ink antialiased">
+    <body class="flex min-h-screen flex-col bg-bone font-sans text-ink antialiased">
         <x-front.layouts.header />
 
-        {{ $slot }}
+        <main class="flex-1">
+            {{ $slot }}
+        </main>
 
         <x-front.layouts.footer />
     </body>
