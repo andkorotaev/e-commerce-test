@@ -59,6 +59,22 @@ class ProductService
     }
 
     /**
+     * @return Collection<int, \App\Dto\Product\ProductListItemDto>
+     */
+    public function newArrivals(int $limit = 10): Collection
+    {
+        return $this->products->newArrivals($limit);
+    }
+
+    /**
+     * @return Collection<int, \App\Dto\Product\ProductListItemDto>
+     */
+    public function popular(int $limit = 8): Collection
+    {
+        return $this->products->popular($limit);
+    }
+
+    /**
      * @throws RuntimeException
      */
     public function create(ProductInputDto $dto): ProductDto

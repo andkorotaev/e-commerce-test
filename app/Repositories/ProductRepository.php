@@ -8,6 +8,7 @@ use App\Dto\Product\ProductListItemDto;
 use App\Models\Product;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class ProductRepository
 {
@@ -216,6 +217,69 @@ class ProductRepository
             'min' => $result?->min_price !== null ? (float) $result->min_price : 0.0,
             'max' => $result?->max_price !== null ? (float) $result->max_price : 0.0,
         ];
+    }
+
+    /**
+     * Most recently added active products — the homepage's "New arrivals" rail.
+     *
+     * @return Collection<int, ProductListItemDto>
+     */
+    public function newArrivals(int $limit): Collection
+    {
+        $locale = app()->getLocale();
+
+        return Product::where('is_active', true)
+            ->with([
+                'translations' => fn ($query) => $query->where('locale', $locale),
+                'images' => fn ($query) => $query->orderBy('sort_order')->limit(1),
+                'brand',
+            ])
+            ->orderByDesc('created_at')
+            ->limit($limit)
+            ->get()
+            ->map(fn (Product $product) => ProductListItemDto::fromModel($product, $locale));
+    }
+
+    /**
+     * Active products ordered by real customer approval — average approved
+     * review rating first (best-rated first, products with no reviews yet
+     * sort after those that have any), then review count as a tiebreaker,
+     * then sort_order for products with no reviews at all. The homepage's
+     * "Popular products" grid.
+     *
+     * @return Collection<int, ProductListItemDto>
+     */
+    public function popular(int $limit): Collection
+    {
+        $locale = app()->getLocale();
+
+        $ids = Product::query()
+            ->where('products.is_active', true)
+            ->leftJoin('reviews', function ($join) {
+                $join->on('reviews.product_id', '=', 'products.id')->where('reviews.is_approved', true);
+            })
+            ->groupBy('products.id')
+            ->orderByRaw('AVG(reviews.rating) IS NULL')
+            ->orderByDesc(DB::raw('AVG(reviews.rating)'))
+            ->orderByDesc(DB::raw('COUNT(reviews.id)'))
+            ->orderBy('products.sort_order')
+            ->limit($limit)
+            ->pluck('products.id');
+
+        $products = Product::whereIn('id', $ids)
+            ->with([
+                'translations' => fn ($query) => $query->where('locale', $locale),
+                'images' => fn ($query) => $query->orderBy('sort_order')->limit(1),
+                'brand',
+            ])
+            ->get()
+            ->keyBy('id');
+
+        return $ids
+            ->map(fn (int $id) => $products->get($id))
+            ->filter()
+            ->values()
+            ->map(fn (Product $product) => ProductListItemDto::fromModel($product, $locale));
     }
 
     /**

@@ -43,6 +43,34 @@ class ReviewRepository
     }
 
     /**
+     * Bulk version of ratingStats() — one query for a whole list of
+     * products (e.g. the homepage's "Popular products" grid) instead of
+     * one query per card.
+     *
+     * @param  array<int, int>  $productIds
+     * @return array<int, array{average: float, count: int}> keyed by product id
+     */
+    public function ratingStatsForProducts(array $productIds): array
+    {
+        if ($productIds === []) {
+            return [];
+        }
+
+        return Review::whereIn('product_id', $productIds)
+            ->where('is_approved', true)
+            ->selectRaw('product_id, AVG(rating) as average_rating, COUNT(*) as review_count')
+            ->groupBy('product_id')
+            ->get()
+            ->mapWithKeys(fn ($row) => [
+                $row->product_id => [
+                    'average' => round((float) $row->average_rating, 1),
+                    'count' => (int) $row->review_count,
+                ],
+            ])
+            ->all();
+    }
+
+    /**
      * Every review, newest first, with its product's name attached — the
      * admin moderation queue.
      *

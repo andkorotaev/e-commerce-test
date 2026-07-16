@@ -32,6 +32,15 @@ class ReviewService
     }
 
     /**
+     * @param  array<int, int>  $productIds
+     * @return array<int, array{average: float, count: int}>
+     */
+    public function ratingStatsForProducts(array $productIds): array
+    {
+        return $this->reviews->ratingStatsForProducts($productIds);
+    }
+
+    /**
      * @return Collection<int, ReviewDto>
      */
     public function all(): Collection

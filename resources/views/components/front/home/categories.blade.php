@@ -1,6 +1,6 @@
 @props(['categories'])
 
-<section class="mx-auto max-w-6xl px-10 py-20">
+<section id="categories" class="mx-auto max-w-6xl scroll-mt-6 px-4 py-16 md:px-10 md:py-20">
     <div class="mb-10">
         <p class="font-mono text-xs uppercase tracking-widest text-stone">Каталог</p>
         <h2 class="mt-2 font-serif text-3xl text-ink">Категорії</h2>

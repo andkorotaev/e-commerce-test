@@ -3,6 +3,8 @@
 namespace Tests\Feature\Front;
 
 use App\Models\Category;
+use App\Models\Product;
+use App\Models\Review;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -15,6 +17,75 @@ class HomeTest extends TestCase
         $response = $this->get(route('front.home'));
 
         $response->assertOk();
+    }
+
+    public function test_homepage_shows_the_hero_banner_with_a_catalog_link(): void
+    {
+        $response = $this->get(route('front.home'));
+
+        $response->assertOk();
+        $response->assertSee('Перейти до каталогу');
+        $response->assertSee('#categories', false);
+    }
+
+    public function test_homepage_shows_new_arrivals_with_photo_name_price_and_link(): void
+    {
+        $product = Product::factory()->create(['price' => 777, 'stock' => 5]);
+        $product->translations()->where('locale', 'uk')->update(['name' => 'Новинка сезону', 'slug' => 'novynka-sezonu']);
+
+        $response = $this->get(route('front.home'));
+
+        $response->assertOk();
+        $response->assertSee('Новинки');
+        $response->assertSee('Новинка сезону');
+        $response->assertSee('777', false);
+        $response->assertSee(route('front.products.show', 'novynka-sezonu'), false);
+    }
+
+    public function test_homepage_shows_popular_products_with_rating_and_add_to_cart(): void
+    {
+        $product = Product::factory()->create(['price' => 555, 'stock' => 5]);
+        $product->translations()->where('locale', 'uk')->update(['name' => 'Улюблений товар']);
+        Review::factory()->for($product)->create(['rating' => 5, 'is_approved' => true]);
+
+        $response = $this->get(route('front.home'));
+
+        $response->assertOk();
+        $response->assertSee('Популярні товари');
+        $response->assertSee('Улюблений товар');
+        $response->assertSee('555', false);
+        $response->assertSee('name="product_id" value="'.$product->id.'"', false);
+    }
+
+    public function test_adding_a_popular_product_to_cart_from_the_homepage_works(): void
+    {
+        $product = Product::factory()->create(['price' => 300, 'stock' => 5]);
+
+        $response = $this->post(route('front.cart.add'), ['product_id' => $product->id, 'quantity' => 1]);
+
+        $response->assertRedirect();
+        $cartCookie = collect($response->headers->getCookies())->first(fn ($cookie) => $cookie->getName() === 'guest_cart');
+        $this->assertNotNull($cartCookie, 'Expected the add-to-cart form to queue a guest_cart cookie.');
+    }
+
+    public function test_homepage_shows_store_benefits(): void
+    {
+        $response = $this->get(route('front.home'));
+
+        $response->assertOk();
+        $response->assertSee('Швидка доставка');
+        $response->assertSee('Повернення протягом 14 днів');
+        $response->assertSee('Гарантія якості');
+        $response->assertSee('Онлайн підтримка');
+    }
+
+    public function test_footer_shows_contacts_navigation_and_copyright(): void
+    {
+        $response = $this->get(route('front.home'));
+
+        $response->assertOk();
+        $response->assertSee('hello@ocre.ua');
+        $response->assertSee((string) date('Y').' OCRE');
     }
 
     public function test_homepage_shows_active_root_categories_with_image_name_and_description(): void

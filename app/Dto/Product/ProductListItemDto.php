@@ -21,6 +21,8 @@ final readonly class ProductListItemDto
         public ?string $image,
         public ?string $brandName,
         public int $stock,
+        public ?float $rating = null,
+        public ?int $reviewsCount = null,
     ) {}
 
     public static function fromModel(Product $product, string $locale): self
@@ -36,6 +38,28 @@ final readonly class ProductListItemDto
             image: $product->images->first()?->path,
             brandName: $product->brand?->name,
             stock: $product->stock,
+        );
+    }
+
+    /**
+     * Returns a copy with rating data attached — kept separate from
+     * fromModel() since rating stats come from a bulk query across a whole
+     * product list, not from the Product model itself (mirrors
+     * CategoryDto::withChildren()'s "augment after the fact" shape).
+     */
+    public function withRating(float $rating, int $reviewsCount): self
+    {
+        return new self(
+            id: $this->id,
+            name: $this->name,
+            slug: $this->slug,
+            price: $this->price,
+            oldPrice: $this->oldPrice,
+            image: $this->image,
+            brandName: $this->brandName,
+            stock: $this->stock,
+            rating: $rating,
+            reviewsCount: $reviewsCount,
         );
     }
 }

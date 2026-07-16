@@ -40,6 +40,13 @@ class AppServiceProvider extends ServiceProvider
             $view->with('cartCount', app(CartService::class)->count());
         });
 
+        // The footer's nav column only needs the 4 root categories (not the
+        // header's full 3-level tree), so it gets its own lean composer
+        // rather than reusing the header's heavier navigation() query.
+        View::composer('components.front.layouts.footer', function ($view) {
+            $view->with('categories', app(CategoryService::class)->roots());
+        });
+
         // Laravel's built-in ResetPassword notification hardcodes a lookup
         // for a route literally named "password.reset" when building the
         // emailed reset link. This project's front routes are all prefixed
