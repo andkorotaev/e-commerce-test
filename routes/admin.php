@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductAttributeController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ReviewController;
@@ -40,5 +41,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('reviews', [ReviewController::class, 'index'])->name('reviews.index');
         Route::post('reviews/{reviewId}/approve', [ReviewController::class, 'approve'])->name('reviews.approve');
         Route::delete('reviews/{reviewId}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
+
+        Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
+        Route::get('orders/{orderId}', [OrderController::class, 'show'])->name('orders.show');
+        Route::put('orders/{orderId}/status', [OrderController::class, 'updateStatus'])->name('orders.status');
     });
 });

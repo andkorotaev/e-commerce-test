@@ -40,4 +40,22 @@ class OrderRepository
             ->get()
             ->map(fn (Order $order) => OrderDto::fromModel($order));
     }
+
+    /**
+     * Every order, newest first — the admin order list.
+     *
+     * @return Collection<int, OrderDto>
+     */
+    public function all(): Collection
+    {
+        return Order::with(self::WITH)
+            ->orderByDesc('created_at')
+            ->get()
+            ->map(fn (Order $order) => OrderDto::fromModel($order));
+    }
+
+    public function updateStatus(int $id, string $status): void
+    {
+        Order::whereKey($id)->update(['status' => $status]);
+    }
 }

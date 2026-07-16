@@ -37,6 +37,28 @@ class OrderService
     }
 
     /**
+     * @return Collection<int, OrderDto>
+     */
+    public function all(): Collection
+    {
+        return $this->orders->all();
+    }
+
+    /**
+     * @throws RuntimeException
+     */
+    public function updateStatus(int $orderId, string $status): void
+    {
+        try {
+            $this->orders->updateStatus($orderId, $status);
+        } catch (Throwable $e) {
+            report($e);
+
+            throw new RuntimeException("Failed to update order #{$orderId} status.", previous: $e);
+        }
+    }
+
+    /**
      * Places an order from the current cart. For a guest who checked
      * "create an account", a real account is created and logged into first
      * (so the order can be attached to it like any other logged-in
