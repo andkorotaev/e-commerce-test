@@ -17,4 +17,8 @@
             <x-front.layouts.header.cart :count="$cartCount" />
         </div>
     </header>
+
+    <x-front.layouts.header.search-modal />
+    <x-front.layouts.header.wishlist-modal />
+    <x-front.layouts.header.cart-modal />
 </div>

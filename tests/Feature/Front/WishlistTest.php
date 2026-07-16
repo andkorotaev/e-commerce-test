@@ -72,6 +72,44 @@ class WishlistTest extends TestCase
         $response->assertSee('В обраному');
     }
 
+    public function test_ajax_toggle_returns_the_new_state_as_json_without_reloading(): void
+    {
+        $user = User::factory()->create();
+        $product = Product::factory()->create();
+
+        $response = $this->actingAs($user)->post(
+            route('front.wishlist.toggle', $product->id),
+            [],
+            ['X-Requested-With' => 'XMLHttpRequest'],
+        );
+
+        $response->assertOk();
+        $response->assertJson(['isWishlisted' => true]);
+        $this->assertDatabaseHas('wishlist_items', ['user_id' => $user->id, 'product_id' => $product->id]);
+
+        $secondResponse = $this->actingAs($user)->post(
+            route('front.wishlist.toggle', $product->id),
+            [],
+            ['X-Requested-With' => 'XMLHttpRequest'],
+        );
+
+        $secondResponse->assertJson(['isWishlisted' => false]);
+    }
+
+    public function test_ajax_wishlist_show_returns_only_the_contents_partial(): void
+    {
+        $user = User::factory()->create();
+        $product = Product::factory()->create();
+        $product->translations()->where('locale', 'uk')->update(['name' => 'Список бажань товар']);
+        WishlistItem::factory()->create(['user_id' => $user->id, 'product_id' => $product->id]);
+
+        $response = $this->actingAs($user)->get(route('front.account.wishlist'), ['X-Requested-With' => 'XMLHttpRequest']);
+
+        $response->assertOk();
+        $response->assertDontSee('<html', false);
+        $response->assertSee('Список бажань товар');
+    }
+
     public function test_header_shows_wishlist_count_for_logged_in_user(): void
     {
         $user = User::factory()->create();

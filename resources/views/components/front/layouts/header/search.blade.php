@@ -2,6 +2,7 @@
 
 <button
     type="button"
+    data-search-trigger
     aria-label="{{ __('header.search') }}"
     class="{{ $dark ? 'text-bone/75 hover:text-bone' : 'text-ink/70 hover:text-ink' }} transition-colors duration-200"
 >

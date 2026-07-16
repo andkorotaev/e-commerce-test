@@ -13,8 +13,14 @@ class CartController extends Controller
 {
     public function __construct(protected CartService $cart) {}
 
-    public function show(): View
+    public function show(Request $request): View
     {
+        if ($request->ajax()) {
+            return view('components.front.cart.contents', [
+                'summary' => $this->cart->summary(),
+            ]);
+        }
+
         return view('front.cart.show', [
             'summary' => $this->cart->summary(),
         ]);

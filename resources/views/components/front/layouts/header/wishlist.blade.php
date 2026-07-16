@@ -2,6 +2,7 @@
 
 <a
     href="{{ auth()->check() ? route('front.account.wishlist') : route('front.login') }}"
+    data-wishlist-trigger
     aria-label="{{ __('header.wishlist') }}"
     class="relative inline-flex items-center {{ $dark ? 'text-bone/75 hover:text-bone' : 'text-ink/70 hover:text-ink' }} transition-colors duration-200"
 >

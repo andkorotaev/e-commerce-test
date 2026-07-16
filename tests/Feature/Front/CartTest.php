@@ -127,6 +127,19 @@ class CartTest extends TestCase
         $response->assertSee('1 000', false);
     }
 
+    public function test_ajax_cart_show_returns_only_the_contents_partial(): void
+    {
+        $user = User::factory()->create();
+        $product = $this->productWithPrice(200);
+        $this->actingAs($user)->post(route('front.cart.add'), ['product_id' => $product->id, 'quantity' => 2]);
+
+        $response = $this->actingAs($user)->get(route('front.cart.show'), ['X-Requested-With' => 'XMLHttpRequest']);
+
+        $response->assertOk();
+        $response->assertDontSee('<html', false);
+        $response->assertSee('400', false);
+    }
+
     public function test_discount_reflects_the_difference_between_old_price_and_price(): void
     {
         $user = User::factory()->create();

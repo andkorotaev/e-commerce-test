@@ -7,6 +7,7 @@ use App\Dto\Product\ProductListingResultDto;
 use App\Repositories\BrandRepository;
 use App\Repositories\ProductAttributeValueRepository;
 use App\Repositories\ProductRepository;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class ProductListingService
 {
@@ -45,5 +46,21 @@ class ProductListingService
             priceMin: $priceRange['min'],
             priceMax: $priceRange['max'],
         );
+    }
+
+    /**
+     * Active products across the whole catalog whose name matches $query —
+     * the header search modal's results page. Deliberately lean compared to
+     * forCategory(): no facets/price-range, just the matching product grid,
+     * since search results have no filter sidebar.
+     *
+     * @return LengthAwarePaginator<int, \App\Dto\Product\ProductListItemDto>
+     */
+    public function search(string $query, ?int $userId = null, int $perPage = 24): LengthAwarePaginator
+    {
+        $products = $this->products->search($query, $perPage);
+        $products->setCollection($this->wishlist->attachWishlistedTo($this->reviews->attachRatingsTo($products->getCollection()), $userId));
+
+        return $products;
     }
 }

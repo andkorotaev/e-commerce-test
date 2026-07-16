@@ -2,9 +2,19 @@ export function init(root) {
     const contents = root.querySelector('[data-cart-contents]');
     const updateUrl = root.dataset.cartUpdateUrl;
     const removeUrl = root.dataset.cartRemoveUrl;
+    const fetchUrl = root.dataset.cartFetchUrl;
 
     if (!contents) {
         return;
+    }
+
+    if (fetchUrl) {
+        window.addEventListener('cart-modal:open', async () => {
+            const response = await window.axios.get(fetchUrl, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            });
+            contents.innerHTML = response.data;
+        });
     }
 
     let debounceTimer;

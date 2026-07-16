@@ -111,16 +111,25 @@
             </button>
         </form>
         @auth
-            <form method="POST" action="{{ route('front.wishlist.toggle', $product->id) }}">
+            <form
+                method="POST"
+                action="{{ route('front.wishlist.toggle', $product->id) }}"
+                data-component="front/products/wishlist-button"
+                data-add-label="В обране"
+                data-remove-label="В обраному"
+            >
                 @csrf
                 <button
                     type="submit"
+                    data-wishlist-button
+                    data-active-class="border-madder text-madder"
+                    data-inactive-class="border-stone text-ink/70 hover:border-ink hover:text-ink"
                     class="flex items-center justify-center gap-2 border px-6 py-3 font-mono text-xs uppercase tracking-widest transition-colors {{ $isWishlisted ? 'border-madder text-madder' : 'border-stone text-ink/70 hover:border-ink hover:text-ink' }}"
                 >
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="{{ $isWishlisted ? 'currentColor' : 'none' }}" stroke="currentColor" stroke-width="1.5" class="h-4 w-4">
+                    <svg data-wishlist-icon xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="{{ $isWishlisted ? 'currentColor' : 'none' }}" stroke="currentColor" stroke-width="1.5" class="h-4 w-4">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 20s-7-4.35-9.5-8.5C.5 8 2 4.5 5.5 4c2-.3 3.7.7 4.5 2 .8-1.3 2.5-2.3 4.5-2 3.5.5 5 4 3 7.5C19 15.65 12 20 12 20z" />
                     </svg>
-                    {{ $isWishlisted ? 'В обраному' : 'В обране' }}
+                    <span data-wishlist-label>{{ $isWishlisted ? 'В обраному' : 'В обране' }}</span>
                 </button>
             </form>
         @else

@@ -50,8 +50,16 @@ class AccountController extends Controller
 
     public function wishlist(Request $request): View
     {
+        $products = $this->wishlist->forUser($request->user()->id);
+
+        if ($request->ajax()) {
+            return view('components.front.wishlist.contents', [
+                'products' => $products,
+            ]);
+        }
+
         return view('front.account.wishlist', [
-            'products' => $this->wishlist->forUser($request->user()->id),
+            'products' => $products,
         ]);
     }
 }

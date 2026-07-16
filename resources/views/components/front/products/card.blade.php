@@ -32,14 +32,23 @@
 
         <div class="absolute right-2 top-2 z-10">
             @auth
-                <form method="POST" action="{{ route('front.wishlist.toggle', $product->id) }}">
+                <form
+                    method="POST"
+                    action="{{ route('front.wishlist.toggle', $product->id) }}"
+                    data-component="front/products/wishlist-button"
+                    data-add-label="Додати до списку бажань"
+                    data-remove-label="Видалити зі списку бажань"
+                >
                     @csrf
                     <button
                         type="submit"
+                        data-wishlist-button
+                        data-active-class="text-madder"
+                        data-inactive-class="text-ink/60"
                         aria-label="{{ $product->isWishlisted ? 'Видалити зі списку бажань' : 'Додати до списку бажань' }}"
-                        class="flex h-8 w-8 items-center justify-center bg-bone/80 backdrop-blur-sm transition-colors hover:bg-bone {{ $product->isWishlisted ? 'text-madder' : 'text-ink/60' }}"
+                        class="flex h-8 w-8 items-center justify-center bg-bone/80 backdrop-blur-sm transition-colors hover:bg-bone hover:text-madder {{ $product->isWishlisted ? 'text-madder' : 'text-ink/60' }}"
                     >
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="{{ $product->isWishlisted ? 'currentColor' : 'none' }}" stroke="currentColor" stroke-width="1.5" class="h-4 w-4">
+                        <svg data-wishlist-icon xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="{{ $product->isWishlisted ? 'currentColor' : 'none' }}" stroke="currentColor" stroke-width="1.5" class="h-4 w-4">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 20s-7-4.35-9.5-8.5C.5 8 2 4.5 5.5 4c2-.3 3.7.7 4.5 2 .8-1.3 2.5-2.3 4.5-2 3.5.5 5 4 3 7.5C19 15.65 12 20 12 20z" />
                         </svg>
                     </button>

@@ -278,6 +278,31 @@ class ProductRepository
     }
 
     /**
+     * Active products whose translated name matches $query, across the
+     * whole catalog (not scoped to a category) — the header search modal's
+     * results page.
+     *
+     * @return LengthAwarePaginator<int, ProductListItemDto>
+     */
+    public function search(string $query, int $perPage): LengthAwarePaginator
+    {
+        $locale = app()->getLocale();
+
+        return Product::where('is_active', true)
+            ->whereHas('translations', function ($q) use ($query, $locale) {
+                $q->where('locale', $locale)->where('name', 'like', '%'.$query.'%');
+            })
+            ->with([
+                'translations' => fn ($q) => $q->where('locale', $locale),
+                'images' => fn ($q) => $q->orderBy('sort_order')->limit(1),
+            ])
+            ->orderBy('sort_order')
+            ->paginate($perPage)
+            ->withQueryString()
+            ->through(fn (Product $product) => ProductListItemDto::fromModel($product, $locale));
+    }
+
+    /**
      * @param  array<string, mixed>  $attributes
      */
     public function create(array $attributes): ProductDto

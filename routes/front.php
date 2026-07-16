@@ -11,10 +11,12 @@ use App\Http\Controllers\Front\CheckoutController;
 use App\Http\Controllers\Front\HomeController;
 use App\Http\Controllers\Front\ProductController;
 use App\Http\Controllers\Front\ReviewController;
+use App\Http\Controllers\Front\SearchController;
 use App\Http\Controllers\Front\WishlistController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('front.home');
+Route::get('/search', [SearchController::class, 'index'])->name('front.search');
 Route::get('/catalog/{slug}/products', [CategoryController::class, 'products'])->name('front.categories.products');
 Route::get('/catalog/{slug}', [CategoryController::class, 'show'])->name('front.categories.show');
 Route::get('/product/{slug}', [ProductController::class, 'show'])->name('front.products.show');
