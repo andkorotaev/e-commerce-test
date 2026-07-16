@@ -1,0 +1,69 @@
+# Production compose file — lives on the server, pulled/started by scripts/deploy.sh.
+# Requires a real .env next to this file on the server (APP_KEY, DB_*, etc.) —
+# never committed, created once by hand during server provisioning.
+# IMAGE/TAG are exported into the shell by the deploy workflow before `docker compose`
+# runs, so they don't need to live in that .env file.
+
+services:
+  app:
+    image: ${IMAGE:-ghcr.io/andkorotaev/e-commerce-test}:${TAG:-latest}
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - '80:80'
+    volumes:
+      - storage-app:/var/www/html/storage/app
+      - storage-logs:/var/www/html/storage/logs
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks: [app]
+
+  queue:
+    image: ${IMAGE:-ghcr.io/andkorotaev/e-commerce-test}:${TAG:-latest}
+    restart: unless-stopped
+    command: php artisan queue:work --tries=3 --sleep=3
+    env_file: .env
+    volumes:
+      - storage-app:/var/www/html/storage/app
+      - storage-logs:/var/www/html/storage/logs
+    depends_on:
+      - app
+    networks: [app]
+
+  scheduler:
+    image: ${IMAGE:-ghcr.io/andkorotaev/e-commerce-test}:${TAG:-latest}
+    restart: unless-stopped
+    command: ['sh', '-c', 'while true; do php artisan schedule:run --no-interaction; sleep 60; done']
+    env_file: .env
+    volumes:
+      - storage-app:/var/www/html/storage/app
+      - storage-logs:/var/www/html/storage/logs
+    depends_on:
+      - app
+    networks: [app]
+
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-p${DB_ROOT_PASSWORD}']
+      retries: 5
+      timeout: 5s
+    networks: [app]
+
+volumes:
+  storage-app:
+  storage-logs:
+  mysql-data:
+
+networks:
+  app:
+    driver: bridge
