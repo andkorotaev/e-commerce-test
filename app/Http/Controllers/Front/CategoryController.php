@@ -21,7 +21,7 @@ class CategoryController extends Controller
 
         abort_if($category === null, 404);
 
-        $listing = $this->listing->forCategory($category->id, $request->getFilterDto());
+        $listing = $this->listing->forCategory($category->id, $request->getFilterDto(), $request->user()?->id);
 
         return view('front.categories.show', [
             'category' => $category,
@@ -43,7 +43,7 @@ class CategoryController extends Controller
 
         abort_if($category === null, 404);
 
-        $listing = $this->listing->forCategory($category->id, $request->getFilterDto());
+        $listing = $this->listing->forCategory($category->id, $request->getFilterDto(), $request->user()?->id);
 
         return view('components.front.products.listing.results', [
             'listing' => $listing,

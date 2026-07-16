@@ -3,12 +3,18 @@
 namespace App\Dto\Product;
 
 use App\Models\Product;
+use Illuminate\Support\Str;
 
 /**
  * Lean card shape for the category listing grid — deliberately not the full
  * admin-facing ProductDto (no full image/variant collections, no meta
  * fields), the same "split only when the shape genuinely differs" rule
- * applied elsewhere in this codebase.
+ * applied elsewhere in this codebase. This is the ONE product card shape
+ * used everywhere a product grid appears (category listing, new arrivals,
+ * popular products, similar products, wishlist) — every such card shows the
+ * same fields (photo/name/price/rating/short description/add-to-cart), so
+ * they all share this single DTO and a single Blade card component rather
+ * than each place inventing its own slightly-different shape.
  */
 final readonly class ProductListItemDto
 {
@@ -19,10 +25,11 @@ final readonly class ProductListItemDto
         public float $price,
         public ?float $oldPrice,
         public ?string $image,
-        public ?string $brandName,
+        public ?string $description,
         public int $stock,
         public ?float $rating = null,
         public ?int $reviewsCount = null,
+        public bool $isWishlisted = false,
     ) {}
 
     public static function fromModel(Product $product, string $locale): self
@@ -36,7 +43,7 @@ final readonly class ProductListItemDto
             price: (float) $product->price,
             oldPrice: $product->old_price !== null ? (float) $product->old_price : null,
             image: $product->images->first()?->path,
-            brandName: $product->brand?->name,
+            description: $translation?->description ? Str::limit($translation->description, 90) : null,
             stock: $product->stock,
         );
     }
@@ -56,10 +63,34 @@ final readonly class ProductListItemDto
             price: $this->price,
             oldPrice: $this->oldPrice,
             image: $this->image,
-            brandName: $this->brandName,
+            description: $this->description,
             stock: $this->stock,
             rating: $rating,
             reviewsCount: $reviewsCount,
+            isWishlisted: $this->isWishlisted,
+        );
+    }
+
+    /**
+     * Returns a copy flagged as wishlisted (or not) — kept separate from
+     * fromModel() for the same reason as withRating(): whether a product is
+     * in the current user's wishlist comes from a separate bulk lookup
+     * against wishlist_items, not from the Product model itself.
+     */
+    public function withWishlisted(bool $isWishlisted): self
+    {
+        return new self(
+            id: $this->id,
+            name: $this->name,
+            slug: $this->slug,
+            price: $this->price,
+            oldPrice: $this->oldPrice,
+            image: $this->image,
+            description: $this->description,
+            stock: $this->stock,
+            rating: $this->rating,
+            reviewsCount: $this->reviewsCount,
+            isWishlisted: $isWishlisted,
         );
     }
 }

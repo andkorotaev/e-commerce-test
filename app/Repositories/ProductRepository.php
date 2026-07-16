@@ -52,7 +52,6 @@ class ProductRepository
             ->with([
                 'translations' => fn ($query) => $query->where('locale', $locale),
                 'images' => fn ($query) => $query->orderBy('sort_order')->limit(1),
-                'brand',
             ])
             ->get()
             ->map(fn (Product $product) => ProductListItemDto::fromModel($product, $locale))
@@ -116,7 +115,6 @@ class ProductRepository
             ->with([
                 'translations' => fn ($query) => $query->where('locale', $locale),
                 'images' => fn ($query) => $query->orderBy('sort_order')->limit(1),
-                'brand',
             ])
             ->orderBy('sort_order')
             ->limit($limit)
@@ -149,7 +147,6 @@ class ProductRepository
             ->with([
                 'translations' => fn ($query) => $query->where('locale', $locale),
                 'images' => fn ($query) => $query->orderBy('sort_order')->limit(1),
-                'brand',
             ]);
 
         if ($filters->brandIds->isNotEmpty()) {
@@ -232,7 +229,6 @@ class ProductRepository
             ->with([
                 'translations' => fn ($query) => $query->where('locale', $locale),
                 'images' => fn ($query) => $query->orderBy('sort_order')->limit(1),
-                'brand',
             ])
             ->orderByDesc('created_at')
             ->limit($limit)
@@ -270,7 +266,6 @@ class ProductRepository
             ->with([
                 'translations' => fn ($query) => $query->where('locale', $locale),
                 'images' => fn ($query) => $query->orderBy('sort_order')->limit(1),
-                'brand',
             ])
             ->get()
             ->keyBy('id');

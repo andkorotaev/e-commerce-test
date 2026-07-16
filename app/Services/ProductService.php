@@ -22,6 +22,7 @@ class ProductService
         protected ProductTranslationRepository $translations,
         protected ProductImageRepository $images,
         protected ProductVariantRepository $variants,
+        protected ReviewService $reviews,
     ) {}
 
     /**
@@ -55,7 +56,7 @@ class ProductService
      */
     public function similarTo(ProductDto $product, int $limit = 8): Collection
     {
-        return $this->products->similarTo($product->categoryId, $product->id, $limit);
+        return $this->reviews->attachRatingsTo($this->products->similarTo($product->categoryId, $product->id, $limit));
     }
 
     /**
@@ -63,7 +64,7 @@ class ProductService
      */
     public function newArrivals(int $limit = 10): Collection
     {
-        return $this->products->newArrivals($limit);
+        return $this->reviews->attachRatingsTo($this->products->newArrivals($limit));
     }
 
     /**
@@ -71,7 +72,7 @@ class ProductService
      */
     public function popular(int $limit = 8): Collection
     {
-        return $this->products->popular($limit);
+        return $this->reviews->attachRatingsTo($this->products->popular($limit));
     }
 
     /**

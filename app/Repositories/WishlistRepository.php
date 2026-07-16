@@ -29,7 +29,6 @@ class WishlistRepository
             ->with([
                 'translations' => fn ($query) => $query->where('locale', $locale),
                 'images' => fn ($query) => $query->orderBy('sort_order')->limit(1),
-                'brand',
             ])
             ->get()
             ->keyBy('id');

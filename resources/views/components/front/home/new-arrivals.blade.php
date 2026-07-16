@@ -34,7 +34,7 @@
     <div data-scroll-track class="flex snap-x snap-mandatory gap-6 overflow-x-auto pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         @foreach ($products as $index => $product)
             <div class="w-[45vw] shrink-0 snap-start sm:w-[260px]">
-                <x-front.products.listing.card :product="$product" :index="$index" />
+                <x-front.products.card :product="$product" :index="$index" />
             </div>
         @endforeach
     </div>

@@ -6,7 +6,7 @@
     @else
         <div class="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 xl:grid-cols-4">
             @foreach ($listing->products as $index => $product)
-                <x-front.products.listing.card :product="$product" :index="$index" />
+                <x-front.products.card :product="$product" :index="$index" />
             @endforeach
         </div>
 

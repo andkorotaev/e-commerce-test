@@ -12,6 +12,7 @@ class WishlistService
 {
     public function __construct(
         protected WishlistRepository $wishlist,
+        protected ReviewService $reviews,
     ) {}
 
     /**
@@ -19,7 +20,30 @@ class WishlistService
      */
     public function forUser(int $userId): Collection
     {
-        return $this->wishlist->productsForUser($userId);
+        $products = $this->reviews->attachRatingsTo($this->wishlist->productsForUser($userId));
+
+        return $products->map(fn (ProductListItemDto $product) => $product->withWishlisted(true));
+    }
+
+    /**
+     * Bulk-flags which of $products are already saved by $userId — the
+     * shared enrichment point for every product grid outside the wishlist
+     * page itself (which is trivially all-wishlisted, see forUser() above).
+     * A guest (null $userId) can't have anything wishlisted, so the list is
+     * returned untouched rather than paying for a query.
+     *
+     * @param  Collection<int, ProductListItemDto>  $products
+     * @return Collection<int, ProductListItemDto>
+     */
+    public function attachWishlistedTo(Collection $products, ?int $userId): Collection
+    {
+        if ($userId === null) {
+            return $products;
+        }
+
+        $wishlistedIds = $this->wishlist->productIdsForUser($userId);
+
+        return $products->map(fn (ProductListItemDto $product) => $product->withWishlisted($wishlistedIds->contains($product->id)));
     }
 
     /**

@@ -15,6 +15,8 @@ class ProductListingService
         protected BrandRepository $brands,
         protected ProductAttributeValueRepository $attributeValues,
         protected CategoryService $categories,
+        protected ReviewService $reviews,
+        protected WishlistService $wishlist,
     ) {}
 
     /**
@@ -24,7 +26,7 @@ class ProductListingService
      * specific child categories via the "category" filter checkboxes, scope
      * to the union of those children's own subtrees instead.
      */
-    public function forCategory(int $categoryId, ProductFilterDto $filters): ProductListingResultDto
+    public function forCategory(int $categoryId, ProductFilterDto $filters, ?int $userId = null): ProductListingResultDto
     {
         $categoryIds = $filters->categoryIds->isNotEmpty()
             ? $filters->categoryIds->flatMap(fn (int $id) => $this->categories->descendantIds($id))->unique()->values()->all()
@@ -32,8 +34,11 @@ class ProductListingService
 
         $priceRange = $this->products->priceRangeForCategories($categoryIds);
 
+        $products = $this->products->filtered($categoryIds, $filters);
+        $products->setCollection($this->wishlist->attachWishlistedTo($this->reviews->attachRatingsTo($products->getCollection()), $userId));
+
         return new ProductListingResultDto(
-            products: $this->products->filtered($categoryIds, $filters),
+            products: $products,
             brands: $this->brands->facetForCategories($categoryIds),
             colors: $this->attributeValues->facetForCategories('color', $categoryIds),
             sizes: $this->attributeValues->facetForCategories('size', $categoryIds),

@@ -42,7 +42,7 @@ class ProductController extends Controller
             'ancestors' => $category ? $this->categories->ancestors($category->id) : collect(),
             'colorAttributeId' => $colorAttribute?->id,
             'sizeAttributeId' => $sizeAttribute?->id,
-            'similar' => $this->products->similarTo($product),
+            'similar' => $this->wishlist->attachWishlistedTo($this->products->similarTo($product), $user?->id),
             'ratingStats' => $this->reviews->ratingStats($product->id),
             'reviews' => $this->reviews->approvedForProduct($product->id),
             'isWishlisted' => $user ? $this->wishlist->productIdsForUser($user->id)->contains($product->id) : false,

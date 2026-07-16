@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Dto\Product\ProductListItemDto;
 use App\Dto\Review\ReviewDto;
 use App\Dto\Review\ReviewInputDto;
 use App\Repositories\ReviewRepository;
@@ -38,6 +39,30 @@ class ReviewService
     public function ratingStatsForProducts(array $productIds): array
     {
         return $this->reviews->ratingStatsForProducts($productIds);
+    }
+
+    /**
+     * Attaches real rating/review-count data to a list of product cards in
+     * one bulk query — every storefront product grid (category listing,
+     * new arrivals, popular, similar, wishlist) shows a rating per the
+     * product card spec, so this is applied centrally here rather than
+     * duplicated in every controller that builds one of those grids.
+     *
+     * @param  Collection<int, ProductListItemDto>  $products
+     * @return Collection<int, ProductListItemDto>
+     */
+    public function attachRatingsTo(Collection $products): Collection
+    {
+        if ($products->isEmpty()) {
+            return $products;
+        }
+
+        $stats = $this->ratingStatsForProducts($products->pluck('id')->all());
+
+        return $products->map(fn (ProductListItemDto $product) => $product->withRating(
+            $stats[$product->id]['average'] ?? 0.0,
+            $stats[$product->id]['count'] ?? 0,
+        ));
     }
 
     /**
